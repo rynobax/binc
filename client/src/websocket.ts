@@ -1,4 +1,9 @@
-import { ClientToServerMessage, WS_PORT } from "../../shared/shared";
+import {
+  ClientToServerMessage,
+  ServerToClientMessage,
+  WS_PORT,
+} from "../../shared/shared";
+import { lobbySlice, store } from "./store";
 
 interface SocketConnection {
   send: (msg: ClientToServerMessage) => void;
@@ -6,7 +11,6 @@ interface SocketConnection {
 
 const connect = (function () {
   return new Promise<SocketConnection>((resolve) => {
-    // Create a new WebSocket connection to the specified URL
     const socket = new WebSocket(`ws://localhost:${WS_PORT}`);
 
     // Event listener to be called when the WebSocket connection is opened
@@ -24,14 +28,30 @@ const connect = (function () {
     socket.addEventListener("close", function () {
       console.log("WebSocket connection closed");
     });
+
+    socket.addEventListener("message", function (event) {
+      console.log("Message from server ", event.data);
+      try {
+        const data = JSON.parse(event.data) as ServerToClientMessage;
+        switch (data.type) {
+          case "lobby-update":
+            store.dispatch(lobbySlice.actions.updateLobby(data.lobby));
+            break;
+          default:
+            console.error("Unknown message type: ", data);
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    });
   });
 })();
 
-export async function startRoom() {
+export async function startRoom(playlistIds: string[]) {
   const socket = await connect;
   socket.send({
     name: "My Room",
-    playlistIds: ["1", "2"],
+    playlistIds,
     type: "create-room",
   });
 }
