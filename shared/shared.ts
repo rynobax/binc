@@ -16,7 +16,7 @@ export interface Lobby {
 export type GameState =
   | { type: "paused" }
   | {
-      type: "song-queued";
+      type: "queued" | "playing";
       songUrl: string;
       previousSongs: {
         artistNames: string[];
@@ -24,8 +24,7 @@ export type GameState =
         albumArt: string;
       }[];
       scores: { name: string; score: number }[];
-    }
-  | { type: "song-playing"; songUrl: string; albumArt: string };
+    };
 
 export interface ClientRoom {
   id: string;
@@ -39,7 +38,8 @@ export type ClientToServerMessage =
   | CreateRoomMessage
   | JoinRoomMessage
   | LeaveRoomMessage
-  | ReadyMessage;
+  | ReadyMessage
+  | GuessMessage;
 
 export interface CreateRoomMessage {
   type: "create-room";
@@ -59,6 +59,11 @@ export interface LeaveRoomMessage {
 
 export interface ReadyMessage {
   type: "ready";
+}
+
+export interface GuessMessage {
+  type: "guess";
+  guess: "title" | "artist";
 }
 
 export type ServerToClientMessage = LobbyUpdateMessage | RoomUpdateMessage;

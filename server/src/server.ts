@@ -7,6 +7,7 @@ import {
   type RoomStatus,
   type PubSubTopic,
   type ClientRoom,
+  type GuessMessage,
 } from "../../shared/shared";
 import { getPlaylistSongInfo } from "./spotify";
 import { Game } from "./game";
@@ -46,7 +47,7 @@ function getClientRoom(roomId: string): ClientRoom {
     name: room.name,
     users: sortedUsers.map((u) => ({ id: u.id, name: u.name, ready: u.ready })),
     status: room.status,
-    gameState: { type: "paused" },
+    gameState: room.game.getState(),
   };
 }
 
@@ -78,7 +79,9 @@ async function handleCreateRoom(message: CreateRoomMessage) {
   const roomId = generateId();
   if (rooms.has(roomId)) throw new Error("Room ID collision");
   try {
-    const game = new Game();
+    const game = new Game(() => {
+      globalUpdateRoom(roomId);
+    });
     const room: ServerRoom = {
       id: roomId,
       name: message.name,
@@ -148,6 +151,14 @@ function handleReady(ws: WS) {
   globalUpdateRoom(room.id);
 }
 
+function handleGuess(data: GuessMessage, ws: WS) {
+  const room = Array.from(rooms.values()).find((r) =>
+    r.game.users.some((u) => u.id === ws.data.userId)
+  );
+  if (!room) throw new Error("Room not found");
+  room.game.submitUserGuess(ws.data.userId, data.guess);
+}
+
 export function start() {
   startServer(
     (ws) => {
@@ -173,6 +184,9 @@ export function start() {
           break;
         case "ready":
           handleReady(ws);
+          break;
+        case "guess":
+          handleGuess(data, ws);
           break;
         default:
           console.error("Unknown message type: ", data);

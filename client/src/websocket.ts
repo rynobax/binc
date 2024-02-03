@@ -82,3 +82,11 @@ export async function readyUp() {
     type: "ready",
   });
 }
+
+export async function submitCorrectGuess(guess: "title" | "artist") {
+  const socket = await connect;
+  socket.send({
+    type: "guess",
+    guess,
+  });
+}
