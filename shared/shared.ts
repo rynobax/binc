@@ -52,6 +52,8 @@ export interface RoomCreatedMessage {
 
 export type PublishMessage = LobbyUpdateMessage;
 
+export type PubSubTopic = PublishMessage["type"];
+
 export interface LobbyUpdateMessage {
   type: "lobby-update";
   lobby: Lobby;

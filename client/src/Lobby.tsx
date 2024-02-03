@@ -1,18 +1,16 @@
-{import React from "react";
+import React from "react";
 import { useAppSelector } from "./store";
+import { joinRoom } from "./websocket";
 
 const Lobby: React.FC = () => {
-  const lobby = useAppSelector((state) => state.lobby);
-
-  function joinRoom(id: string) {
-    console.log("Joining room", id);
-  }
+  const lobby = useAppSelector((state) => state.lobby.lobby);
+  const name = useAppSelector((state) => state.user.name);
 
   return (
     <div>
       {lobby.rooms.map((room) => (
         <div key={room.id}>
-          <button onClick={() => joinRoom(room.id)}>
+          <button onClick={() => joinRoom(room.id, name)}>
             {room.name} ({room.players} players) - {room.status}
           </button>
         </div>

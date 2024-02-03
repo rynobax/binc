@@ -8,9 +8,14 @@ import {
   type PublishMessage,
   type Lobby,
   type RoomStatus,
+  type PubSubTopic,
 } from "../../shared/shared";
 import { getPlaylistSongInfo } from "./spotify";
 import type { SongInfo } from "./types";
+
+interface WSContext {
+  userId: string;
+}
 
 let server: ReturnType<typeof Bun.serve>;
 
@@ -18,17 +23,21 @@ function publish(message: PublishMessage) {
   server.publish(message.type, JSON.stringify(message));
 }
 
+let id = 1000;
+
 function generateId() {
-  return Math.random().toString(36).slice(2);
+  const strID = id.toString();
+  id++;
+  return strID;
 }
 
-type WS = ServerWebSocket<unknown>;
+type WS = ServerWebSocket<WSContext>;
 
 interface Room {
   name: string;
   playlistIds: string[];
   songIds: Set<string>;
-  users: { name: string; ws: WS }[];
+  users: { id: string; name: string; ws: WS }[];
   status: RoomStatus;
 }
 
@@ -48,6 +57,10 @@ function getLobby(): Lobby {
 
 function globalUpdateLobby() {
   publish({ type: "lobby-update", lobby: getLobby() });
+}
+
+function subscribeToTopic(ws: WS, topic: PubSubTopic) {
+  ws.subscribe(topic);
 }
 
 async function handleCreateRoom(message: CreateRoomMessage) {
@@ -88,10 +101,21 @@ async function handleCreateRoom(message: CreateRoomMessage) {
 }
 
 function handleJoinRoom(message: JoinRoomMessage, ws: WS) {
+  handleLeaveRoom(ws, message.name);
   const room = rooms.get(message.roomId);
   if (!room) throw new Error("Room not found");
-  room.users.push({ ws, name: message.name });
+  room.users.push({ ws, name: message.name, id: ws.data.userId });
   globalUpdateLobby();
+}
+
+function handleLeaveRoom(ws: WS, name: string) {
+  for (const room of rooms.values()) {
+    const index = room.users.findIndex((u) => u.ws === ws);
+    if (index !== -1) {
+      room.users.splice(index, 1);
+      globalUpdateLobby();
+    }
+  }
 }
 
 function sendWSMessage(ws: WS, message: ServerToClientMessage) {
@@ -99,9 +123,9 @@ function sendWSMessage(ws: WS, message: ServerToClientMessage) {
 }
 
 export function start() {
-  server = Bun.serve({
+  server = Bun.serve<WSContext>({
     fetch(req, server) {
-      if (server.upgrade(req)) {
+      if (server.upgrade(req, { data: { userId: generateId() } })) {
         return;
       }
       return new Response("Upgrade failed :(", { status: 500 });
@@ -109,8 +133,10 @@ export function start() {
     websocket: {
       open(ws) {
         sendWSMessage(ws, { type: "lobby-update", lobby: getLobby() });
+        subscribeToTopic(ws, "lobby-update");
       },
       message(ws, message) {
+        console.log(ws.data);
         const data: ClientToServerMessage = JSON.parse(message.toString());
         console.log(data);
         switch (data.type) {

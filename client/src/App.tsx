@@ -1,10 +1,12 @@
 import { useState } from "react";
 import "./App.css";
 import { startRoom } from "./websocket";
+import Lobby from "./Lobby";
+import { useAppSelector, userSlice } from "./store";
 
 function App() {
   const [nameConfirmed, setNameConfirmed] = useState(true);
-  const [username, setUsername] = useState("nukeydog");
+  const username = useAppSelector((state) => state.user.name);
   const [playlistId, setPlaylistId] = useState("37i9dQZEVXbLRQDuF5jeBp");
   if (!nameConfirmed) {
     return (
@@ -12,7 +14,7 @@ function App() {
         <input
           type="text"
           value={username}
-          onChange={(e) => setUsername(e.target.value)}
+          onChange={(e) => userSlice.actions.setName(e.target.value)}
         />
         <button disabled={!username} onClick={() => setNameConfirmed(true)}>
           Choose Name
@@ -31,6 +33,7 @@ function App() {
         />
         <button onClick={() => startRoom([playlistId])}>Create Room</button>
       </div>
+      <Lobby />
     </>
   );
 }

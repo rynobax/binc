@@ -1,3 +1,4 @@
+import ReconnectingWebSocket from "reconnecting-websocket";
 import {
   ClientToServerMessage,
   ServerToClientMessage,
@@ -11,7 +12,7 @@ interface SocketConnection {
 
 const connect = (function () {
   return new Promise<SocketConnection>((resolve) => {
-    const socket = new WebSocket(`ws://localhost:${WS_PORT}`);
+    const socket = new ReconnectingWebSocket(`ws://localhost:${WS_PORT}`);
 
     // Event listener to be called when the WebSocket connection is opened
     socket.addEventListener("open", function () {
@@ -53,5 +54,14 @@ export async function startRoom(playlistIds: string[]) {
     name: "My Room",
     playlistIds,
     type: "create-room",
+  });
+}
+
+export async function joinRoom(roomId: string, username: string) {
+  const socket = await connect;
+  socket.send({
+    roomId,
+    name: username,
+    type: "join-room",
   });
 }

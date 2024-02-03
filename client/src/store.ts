@@ -2,14 +2,27 @@ import { createSlice, configureStore, PayloadAction } from "@reduxjs/toolkit";
 import { Lobby } from "../../shared/shared";
 import { useDispatch, TypedUseSelectorHook, useSelector } from "react-redux";
 
+export const userSlice = createSlice({
+  name: "user",
+  initialState: {
+    name: "nukeydog",
+  } as { name: string },
+  reducers: {
+    setName(state, action: PayloadAction<string>) {
+      state.name = action.payload;
+    },
+  },
+});
+
 export const lobbySlice = createSlice({
   name: "lobby",
   initialState: {
-    rooms: [],
-  } as Lobby,
+    lobby: { rooms: [] },
+  } as { lobby: Lobby },
   reducers: {
     updateLobby(state, action: PayloadAction<Lobby>) {
-      state = action.payload;
+      console.log({ action });
+      state.lobby = action.payload;
     },
   },
 });
@@ -17,8 +30,12 @@ export const lobbySlice = createSlice({
 export const store = configureStore({
   reducer: {
     lobby: lobbySlice.reducer,
+    user: userSlice.reducer,
   },
 });
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+(window as any).store = store;
 
 // Infer the `RootState` and `AppDispatch` types from the store itself
 export type RootState = ReturnType<typeof store.getState>;
