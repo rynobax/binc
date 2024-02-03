@@ -4,7 +4,7 @@ import {
   ServerToClientMessage,
   WS_PORT,
 } from "../../shared/shared";
-import { lobbySlice, store } from "./store";
+import { lobbySlice, roomSlice, store } from "./store";
 
 interface SocketConnection {
   send: (msg: ClientToServerMessage) => void;
@@ -36,7 +36,10 @@ const connect = (function () {
         const data = JSON.parse(event.data) as ServerToClientMessage;
         switch (data.type) {
           case "lobby-update":
-            store.dispatch(lobbySlice.actions.updateLobby(data.lobby));
+            store.dispatch(lobbySlice.actions.setLobby(data.lobby));
+            break;
+          case "room-update":
+            store.dispatch(roomSlice.actions.setRoom(data.room));
             break;
           default:
             console.error("Unknown message type: ", data);
@@ -63,5 +66,19 @@ export async function joinRoom(roomId: string, username: string) {
     roomId,
     name: username,
     type: "join-room",
+  });
+}
+
+export async function leaveRoom() {
+  const socket = await connect;
+  socket.send({
+    type: "leave-room",
+  });
+}
+
+export async function readyUp() {
+  const socket = await connect;
+  socket.send({
+    type: "ready",
   });
 }

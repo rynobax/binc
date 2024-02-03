@@ -9,6 +9,7 @@ import {
   type Lobby,
   type RoomStatus,
   type PubSubTopic,
+  type ClientRoom,
 } from "../../shared/shared";
 import { getPlaylistSongInfo } from "./spotify";
 import type { SongInfo } from "./types";
@@ -19,8 +20,11 @@ interface WSContext {
 
 let server: ReturnType<typeof Bun.serve>;
 
-function publish(message: PublishMessage) {
-  server.publish(message.type, JSON.stringify(message));
+function publish<T extends PubSubTopic>(
+  topic: T,
+  message: Extract<PublishMessage, { topic: T }>
+) {
+  server.publish(topic, JSON.stringify(message));
 }
 
 let id = 1000;
@@ -33,15 +37,16 @@ function generateId() {
 
 type WS = ServerWebSocket<WSContext>;
 
-interface Room {
+interface ServerRoom {
+  id: string;
   name: string;
   playlistIds: string[];
   songIds: Set<string>;
-  users: { id: string; name: string; ws: WS }[];
+  users: { id: string; name: string; ws: WS; ready: boolean }[];
   status: RoomStatus;
 }
 
-const rooms = new Map<string, Room>();
+const rooms = new Map<string, ServerRoom>();
 const songs = new Map<string, SongInfo>();
 
 function getLobby(): Lobby {
@@ -55,19 +60,49 @@ function getLobby(): Lobby {
   };
 }
 
+function getClientRoom(roomId: string): ClientRoom {
+  const room = rooms.get(roomId);
+  if (!room) throw new Error("Room not found");
+  const sortedUsers = room.users.sort((a, b) => a.name.localeCompare(b.name));
+  return {
+    id: roomId,
+    name: room.name,
+    users: sortedUsers.map((u) => ({ id: u.id, name: u.name, ready: u.ready })),
+    status: room.status,
+    gameState: { type: "paused" },
+  };
+}
+
 function globalUpdateLobby() {
-  publish({ type: "lobby-update", lobby: getLobby() });
+  publish("lobby-update", {
+    type: "lobby-update",
+    topic: "lobby-update",
+    lobby: getLobby(),
+  });
+}
+
+function globalUpdateRoom(roomId: string) {
+  publish(`room-update-${roomId}`, {
+    type: "room-update",
+    topic: `room-update-${roomId}`,
+    room: getClientRoom(roomId),
+  });
 }
 
 function subscribeToTopic(ws: WS, topic: PubSubTopic) {
   ws.subscribe(topic);
 }
 
+function unsubscribeToTopic(ws: WS, topic: PubSubTopic) {
+  ws.unsubscribe(topic);
+}
+
 async function handleCreateRoom(message: CreateRoomMessage) {
   const roomId = generateId();
   if (rooms.has(roomId)) throw new Error("Room ID collision");
   try {
-    const room: Room = {
+    const room: ServerRoom = {
+      id: roomId,
       name: message.name,
       playlistIds: message.playlistIds,
       users: [],
@@ -101,21 +136,41 @@ async function handleCreateRoom(message: CreateRoomMessage) {
 }
 
 function handleJoinRoom(message: JoinRoomMessage, ws: WS) {
-  handleLeaveRoom(ws, message.name);
+  handleLeaveRoom(ws);
   const room = rooms.get(message.roomId);
   if (!room) throw new Error("Room not found");
-  room.users.push({ ws, name: message.name, id: ws.data.userId });
+  room.users.push({ ws, name: message.name, id: ws.data.userId, ready: false });
+  subscribeToTopic(ws, `room-update-${message.roomId}`);
+  globalUpdateLobby();
+  globalUpdateRoom(message.roomId);
+}
+
+function handleLeaveRoom(ws: WS) {
+  for (const room of rooms.values()) {
+    const index = room.users.findIndex((u) => u.id === ws.data.userId);
+    if (index !== -1) {
+      room.users.splice(index, 1);
+      unsubscribeToTopic(ws, `room-update-${room.id}`);
+      sendWSMessage(ws, {
+        type: "room-update",
+        topic: `room-update-${room.id}`,
+        room: null,
+      });
+      globalUpdateRoom(room.id);
+    }
+  }
   globalUpdateLobby();
 }
 
-function handleLeaveRoom(ws: WS, name: string) {
-  for (const room of rooms.values()) {
-    const index = room.users.findIndex((u) => u.ws === ws);
-    if (index !== -1) {
-      room.users.splice(index, 1);
-      globalUpdateLobby();
-    }
-  }
+function handleReady(ws: WS) {
+  const room = Array.from(rooms.values()).find((r) =>
+    r.users.some((u) => u.id === ws.data.userId)
+  );
+  if (!room) throw new Error("Room not found");
+  const user = room.users.find((u) => u.id === ws.data.userId);
+  if (!user) throw new Error("User not found");
+  user.ready = true;
+  globalUpdateRoom(room.id);
 }
 
 function sendWSMessage(ws: WS, message: ServerToClientMessage) {
@@ -132,11 +187,14 @@ export function start() {
     },
     websocket: {
       open(ws) {
-        sendWSMessage(ws, { type: "lobby-update", lobby: getLobby() });
+        sendWSMessage(ws, {
+          type: "lobby-update",
+          topic: "lobby-update",
+          lobby: getLobby(),
+        });
         subscribeToTopic(ws, "lobby-update");
       },
       message(ws, message) {
-        console.log(ws.data);
         const data: ClientToServerMessage = JSON.parse(message.toString());
         console.log(data);
         switch (data.type) {
@@ -147,7 +205,10 @@ export function start() {
             handleJoinRoom(data, ws);
             break;
           case "leave-room":
-            // TODO
+            handleLeaveRoom(ws);
+            break;
+          case "ready":
+            handleReady(ws);
             break;
           default:
             console.error("Unknown message type: ", data);

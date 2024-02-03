@@ -13,10 +13,33 @@ export interface Lobby {
   rooms: LobbyRoom[];
 }
 
+export type GameState =
+  | { type: "paused" }
+  | {
+      type: "song-queued";
+      songUrl: string;
+      previousSongs: {
+        artistNames: string[];
+        songUrl: string;
+        albumArt: string;
+      }[];
+      scores: { name: string; score: number }[];
+    }
+  | { type: "song-playing"; songUrl: string; albumArt: string };
+
+export interface ClientRoom {
+  id: string;
+  name: string;
+  users: { id: string; name: string; ready: boolean }[];
+  status: RoomStatus;
+  gameState: GameState;
+}
+
 export type ClientToServerMessage =
   | CreateRoomMessage
   | JoinRoomMessage
-  | LeaveRoomMessage;
+  | LeaveRoomMessage
+  | ReadyMessage;
 
 export interface CreateRoomMessage {
   type: "create-room";
@@ -34,27 +57,24 @@ export interface LeaveRoomMessage {
   type: "leave-room";
 }
 
-export type ServerToClientMessage =
-  | SongStartMessage
-  | RoomCreatedMessage
-  | LobbyUpdateMessage;
-
-export interface SongStartMessage {
-  type: "song-start";
-  url: string;
+export interface ReadyMessage {
+  type: "ready";
 }
 
-export interface RoomCreatedMessage {
-  type: "room-created";
-  roomId: string;
-  roomName: string;
-}
+export type ServerToClientMessage = LobbyUpdateMessage | RoomUpdateMessage;
 
-export type PublishMessage = LobbyUpdateMessage;
+export type PublishMessage = LobbyUpdateMessage | RoomUpdateMessage;
 
-export type PubSubTopic = PublishMessage["type"];
+export type PubSubTopic = PublishMessage["topic"];
 
 export interface LobbyUpdateMessage {
+  topic: "lobby-update";
   type: "lobby-update";
   lobby: Lobby;
+}
+
+export interface RoomUpdateMessage {
+  topic: `room-update-${string}`;
+  type: "room-update";
+  room: ClientRoom | null;
 }

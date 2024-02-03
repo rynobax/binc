@@ -3,10 +3,12 @@ import "./App.css";
 import { startRoom } from "./websocket";
 import Lobby from "./Lobby";
 import { useAppSelector, userSlice } from "./store";
+import Room from "./Room";
 
 function App() {
   const [nameConfirmed, setNameConfirmed] = useState(true);
   const username = useAppSelector((state) => state.user.name);
+  const inRoom = useAppSelector((state) => state.room.room);
   const [playlistId, setPlaylistId] = useState("37i9dQZEVXbLRQDuF5jeBp");
   if (!nameConfirmed) {
     return (
@@ -22,6 +24,9 @@ function App() {
       </div>
     );
   }
+
+  if (inRoom) return <Room />;
+
   return (
     <>
       <h1>binc</h1>

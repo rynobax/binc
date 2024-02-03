@@ -1,5 +1,5 @@
 import { createSlice, configureStore, PayloadAction } from "@reduxjs/toolkit";
-import { Lobby } from "../../shared/shared";
+import { ClientRoom, Lobby } from "../../shared/shared";
 import { useDispatch, TypedUseSelectorHook, useSelector } from "react-redux";
 
 export const userSlice = createSlice({
@@ -20,9 +20,21 @@ export const lobbySlice = createSlice({
     lobby: { rooms: [] },
   } as { lobby: Lobby },
   reducers: {
-    updateLobby(state, action: PayloadAction<Lobby>) {
+    setLobby(state, action: PayloadAction<Lobby>) {
       console.log({ action });
       state.lobby = action.payload;
+    },
+  },
+});
+
+export const roomSlice = createSlice({
+  name: "room",
+  initialState: {
+    room: null,
+  } as { room: ClientRoom | null },
+  reducers: {
+    setRoom(state, action: PayloadAction<ClientRoom | null>) {
+      state.room = action.payload;
     },
   },
 });
@@ -31,6 +43,7 @@ export const store = configureStore({
   reducer: {
     lobby: lobbySlice.reducer,
     user: userSlice.reducer,
+    room: roomSlice.reducer,
   },
 });
 
