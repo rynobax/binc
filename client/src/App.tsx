@@ -1,45 +1,45 @@
 import { useState } from "react";
 import "./App.css";
-import { startRoom } from "./websocket";
 import Lobby from "./Lobby";
-import { useAppSelector, userSlice } from "./store";
+import { store, useAppSelector, userSlice } from "./store";
 import Room from "./Room";
+import Create from "./Create";
+import { Button, Flex, Heading, TextFieldInput } from "@radix-ui/themes";
 
 function App() {
-  const [nameConfirmed, setNameConfirmed] = useState(true);
+  const [nameConfirmed, setNameConfirmed] = useState(false);
   const username = useAppSelector((state) => state.user.name);
   const inRoom = useAppSelector((state) => state.room.room);
-  const [playlistId, setPlaylistId] = useState("37i9dQZEVXbLRQDuF5jeBp");
   if (!nameConfirmed) {
     return (
-      <div>
-        <input
-          type="text"
+      <Flex gap="5">
+        <TextFieldInput
           value={username}
-          onChange={(e) => userSlice.actions.setName(e.target.value)}
+          onChange={(e) =>
+            store.dispatch(userSlice.actions.setName(e.target.value))
+          }
         />
-        <button disabled={!username} onClick={() => setNameConfirmed(true)}>
+        <Button
+          color="violet"
+          disabled={!username}
+          onClick={() => setNameConfirmed(true)}
+        >
           Choose Name
-        </button>
-      </div>
+        </Button>
+      </Flex>
     );
   }
 
   if (inRoom) return <Room />;
 
   return (
-    <>
-      <h1>binc</h1>
-      <div>
-        <input
-          type="text"
-          value={playlistId}
-          onChange={(e) => setPlaylistId(e.target.value)}
-        />
-        <button onClick={() => startRoom([playlistId])}>Create Room</button>
-      </div>
-      <Lobby />
-    </>
+    <Flex direction="column" gap="5">
+      <Heading align="center">binc</Heading>
+      <Flex gap="9">
+        <Create />
+        <Lobby />
+      </Flex>
+    </Flex>
   );
 }
 

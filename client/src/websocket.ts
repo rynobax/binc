@@ -51,10 +51,10 @@ const connect = (function () {
   });
 })();
 
-export async function startRoom(playlistIds: string[]) {
+export async function startRoom(name: string, playlistIds: string[]) {
   const socket = await connect;
   socket.send({
-    name: "My Room",
+    name,
     playlistIds,
     type: "create-room",
   });

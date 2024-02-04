@@ -5,7 +5,7 @@ import { useDispatch, TypedUseSelectorHook, useSelector } from "react-redux";
 export const userSlice = createSlice({
   name: "user",
   initialState: {
-    name: "nukeydog",
+    name: "",
   } as { name: string },
   reducers: {
     setName(state, action: PayloadAction<string>) {

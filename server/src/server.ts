@@ -82,6 +82,7 @@ function unsubscribeToTopic(ws: WS, topic: PubSubTopic) {
 async function handleCreateRoom(message: CreateRoomMessage) {
   const roomId = generateId();
   if (rooms.has(roomId)) throw new Error("Room ID collision");
+  if (!message.name) throw new Error("Room name is required");
   try {
     const game = new Game(() => {
       globalUpdateRoom(roomId);
@@ -141,6 +142,10 @@ function handleLeaveRoom(ws: WS) {
         room: null,
       });
       globalUpdateRoom(room.id);
+
+      if (room.game.users.length === 0) {
+        rooms.delete(room.id);
+      }
     }
   }
   globalUpdateLobby();
@@ -169,26 +174,30 @@ export function start() {
       handleLeaveRoom(ws);
     },
     onMessage: (ws, message) => {
-      const data: ClientToServerMessage = JSON.parse(message.toString());
-      console.log(data);
-      switch (data.type) {
-        case "create-room":
-          handleCreateRoom(data);
-          break;
-        case "join-room":
-          handleJoinRoom(data, ws);
-          break;
-        case "leave-room":
-          handleLeaveRoom(ws);
-          break;
-        case "ready":
-          handleReady(ws);
-          break;
-        case "guess":
-          handleGuess(data, ws);
-          break;
-        default:
-          console.error("Unknown message type: ", data);
+      try {
+        const data: ClientToServerMessage = JSON.parse(message.toString());
+        console.log(data);
+        switch (data.type) {
+          case "create-room":
+            handleCreateRoom(data);
+            break;
+          case "join-room":
+            handleJoinRoom(data, ws);
+            break;
+          case "leave-room":
+            handleLeaveRoom(ws);
+            break;
+          case "ready":
+            handleReady(ws);
+            break;
+          case "guess":
+            handleGuess(data, ws);
+            break;
+          default:
+            console.error("Unknown message type: ", data);
+        }
+      } catch (err) {
+        console.error(err);
       }
     },
     onOpen: (ws) => {
