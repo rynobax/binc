@@ -160,16 +160,11 @@ function handleGuess(data: GuessMessage, ws: WS) {
 }
 
 export function start() {
-  startServer(
-    (ws) => {
-      sendWSMessage(ws, {
-        type: "lobby-update",
-        topic: "lobby-update",
-        lobby: getLobby(),
-      });
-      subscribeToTopic(ws, "lobby-update");
+  startServer({
+    onClose: (ws) => {
+      handleLeaveRoom(ws);
     },
-    (ws, message) => {
+    onMessage: (ws, message) => {
       const data: ClientToServerMessage = JSON.parse(message.toString());
       console.log(data);
       switch (data.type) {
@@ -191,6 +186,14 @@ export function start() {
         default:
           console.error("Unknown message type: ", data);
       }
-    }
-  );
+    },
+    onOpen: (ws) => {
+      sendWSMessage(ws, {
+        type: "lobby-update",
+        topic: "lobby-update",
+        lobby: getLobby(),
+      });
+      subscribeToTopic(ws, "lobby-update");
+    },
+  });
 }

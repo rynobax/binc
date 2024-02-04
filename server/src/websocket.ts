@@ -22,10 +22,11 @@ export function publish<T extends PubSubTopic>(
   server.publish(topic, JSON.stringify(message));
 }
 
-export function startServer(
-  onOpen: (ws: ServerWebSocket<WSContext>) => void,
-  onMessage: (ws: ServerWebSocket<WSContext>, message: string | Buffer) => void
-) {
+export function startServer(handlers: {
+  onClose: (ws: ServerWebSocket<WSContext>) => void;
+  onMessage: (ws: ServerWebSocket<WSContext>, message: string | Buffer) => void;
+  onOpen: (ws: ServerWebSocket<WSContext>) => void;
+}) {
   server = Bun.serve<WSContext>({
     fetch(req, server) {
       if (server.upgrade(req, { data: { userId: generateId() } })) {
@@ -34,8 +35,9 @@ export function startServer(
       return new Response("Upgrade failed :(", { status: 500 });
     },
     websocket: {
-      open: onOpen,
-      message: onMessage,
+      close: handlers.onClose,
+      message: handlers.onMessage,
+      open: handlers.onOpen,
     },
     port: WS_PORT,
   });
