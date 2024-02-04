@@ -5,5 +5,10 @@ module.exports = {
       cwd: "../client/",
       script: "yarn prod",
     },
+    {
+      name: "server",
+      cwd: "../server/",
+      script: "bun prod",
+    },
   ],
 };
