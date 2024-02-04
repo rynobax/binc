@@ -6,7 +6,7 @@ import {
 } from "../../shared/shared";
 import { generateId } from "./util";
 
-const { VITE_WS_SERVER_HOST: PORT } = process.env;
+const { VITE_WS_SERVER_PORT: PORT } = process.env;
 
 interface WSContext {
   userId: string;
