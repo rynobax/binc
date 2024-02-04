@@ -1,6 +1,6 @@
 import React from "react";
 import { useAppSelector } from "./store";
-import { leaveRoom, readyUp, submitCorrectGuess } from "./websocket";
+import { leaveRoom, readyUp } from "./websocket";
 import Game from "./Game";
 
 const Room: React.FC = () => {
@@ -25,12 +25,6 @@ const Room: React.FC = () => {
       ) : (
         <div>
           <Game room={room} />
-          <button onClick={() => submitCorrectGuess("title")}>
-            Guess Title
-          </button>
-          <button onClick={() => submitCorrectGuess("artist")}>
-            Guess Artist
-          </button>
         </div>
       )}
       <button onClick={leaveRoom}>Leave room</button>

@@ -18,6 +18,8 @@ export type GameState =
   | {
       type: "queued" | "playing";
       songUrl: string;
+      songTitle: string;
+      artistNames: string[];
       previousSongs: {
         artistNames: string[];
         songUrl: string;
@@ -82,4 +84,21 @@ export interface RoomUpdateMessage {
   topic: `room-update-${string}`;
   type: "room-update";
   room: ClientRoom | null;
+}
+
+export function shuffle<T>(arr: T[]) {
+  const length = arr.length;
+  if (!length) {
+    return [];
+  }
+  let index = -1;
+  const lastIndex = length - 1;
+  const result = [...arr];
+  while (++index < length) {
+    const rand = index + Math.floor(Math.random() * (lastIndex - index + 1));
+    const value = result[rand];
+    result[rand] = result[index];
+    result[index] = value;
+  }
+  return result;
 }

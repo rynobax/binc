@@ -185,7 +185,7 @@ export interface GetArtistsAlbumsResponse {
 
 export interface SongInfo {
   id: string;
-  name: string;
+  title: string;
   artists: string[];
   albumCover: string;
   previewUrl: string;

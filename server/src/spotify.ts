@@ -80,7 +80,7 @@ export async function getPlaylistSongInfo(
   const tracks = await getAllPlaylistTracks(playlistId);
   return tracks.map((track) => ({
     id: track.id,
-    name: track.name,
+    title: track.name,
     artists: track.artists.map((a) => a.name),
     albumCover: track.album.name,
     previewUrl: track.preview_url,

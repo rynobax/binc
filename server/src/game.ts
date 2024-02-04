@@ -1,7 +1,7 @@
-import type { GameState } from "../../shared/shared";
+import { shuffle, type GameState } from "../../shared/shared";
 import { songs } from "./songs";
 import type { SongInfo } from "./types";
-import { shuffle, wait } from "./util";
+import { wait } from "./util";
 
 const GAME_LENGTH = 15;
 const ROUND_LENGTH = 30000;
@@ -39,6 +39,8 @@ export class Game {
     if (!this.currentSong) throw new Error("No current song");
     return {
       type: this.songState,
+      artistNames: this.currentSong.artists,
+      songTitle: this.currentSong.title,
       previousSongs: this.previousSongs.map((s) => ({
         artistNames: s.artists,
         songUrl: s.previewUrl,
