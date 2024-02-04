@@ -2,9 +2,10 @@ import ReconnectingWebSocket from "reconnecting-websocket";
 import {
   ClientToServerMessage,
   ServerToClientMessage,
-  WS_PORT,
 } from "../../shared/shared";
 import { lobbySlice, roomSlice, store } from "./store";
+
+const { WS_SERVER_HOST, WS_SERVER_PORT } = import.meta.env;
 
 interface SocketConnection {
   send: (msg: ClientToServerMessage) => void;
@@ -12,7 +13,9 @@ interface SocketConnection {
 
 const connect = (function () {
   return new Promise<SocketConnection>((resolve) => {
-    const socket = new ReconnectingWebSocket(`ws://localhost:${WS_PORT}`);
+    const socket = new ReconnectingWebSocket(
+      `ws://${WS_SERVER_HOST}:${WS_SERVER_PORT}`
+    );
 
     // Event listener to be called when the WebSocket connection is opened
     socket.addEventListener("open", function () {

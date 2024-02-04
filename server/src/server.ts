@@ -1,5 +1,4 @@
 import {
-  WS_PORT,
   type ClientToServerMessage,
   type CreateRoomMessage,
   type JoinRoomMessage,

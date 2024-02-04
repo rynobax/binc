@@ -1,5 +1,3 @@
-export const WS_PORT = 3000;
-
 export type RoomStatus = "creating" | "ready" | "playing";
 
 export interface LobbyRoom {
