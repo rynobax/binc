@@ -5,8 +5,8 @@ import {
 } from "../../shared/shared";
 import { lobbySlice, roomSlice, store } from "./store";
 
-const { WS_SERVER_HOST, WS_SERVER_PORT } = import.meta.env;
-console.log(import.meta.env);
+const { VITE_WS_SERVER_HOST: HOST, VITE_WS_SERVER_PORT: PORT } = import.meta
+  .env;
 
 interface SocketConnection {
   send: (msg: ClientToServerMessage) => void;
@@ -14,9 +14,7 @@ interface SocketConnection {
 
 const connect = (function () {
   return new Promise<SocketConnection>((resolve) => {
-    const socket = new ReconnectingWebSocket(
-      `ws://${WS_SERVER_HOST}:${WS_SERVER_PORT}`
-    );
+    const socket = new ReconnectingWebSocket(`ws://${HOST}:${PORT}`);
 
     // Event listener to be called when the WebSocket connection is opened
     socket.addEventListener("open", function () {
