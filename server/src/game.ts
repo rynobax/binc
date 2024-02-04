@@ -43,15 +43,18 @@ export class Game {
       songTitle: this.currentSong.title,
       previousSongs: this.previousSongs.map((s) => ({
         artistNames: s.artists,
-        songUrl: s.previewUrl,
         albumArt: s.albumCover,
+        title: s.title,
       })),
-      scores: this.users.map((u) => {
-        return {
-          name: u.name,
-          score: u.score + this.getUserRoundScore(u.id),
-        };
-      }),
+      scores: this.users
+        .sort((a, b) => b.score - a.score)
+        .map((u) => {
+          return {
+            name: u.name,
+            score: u.score + this.getUserRoundScore(u.id),
+            guesses: this.guesses.get(u.id) || { title: false, artist: false },
+          };
+        }),
       songUrl: this.currentSong.previewUrl,
     };
   }
@@ -125,7 +128,7 @@ export class Game {
       this.songState = "playing";
       this.broadcast();
       await wait(ROUND_LENGTH);
-      this.previousSongs.push(song);
+      this.previousSongs.unshift(song);
 
       // score round
       for (const user of this.users) {

@@ -74,13 +74,17 @@ async function getAllPlaylistTracks(playlistId: string) {
   return tracks;
 }
 
+function cleanSongName(name: string) {
+  return name.replace(/\s\(feat\. .+\)$/, "");
+}
+
 export async function getPlaylistSongInfo(
   playlistId: string
 ): Promise<SongInfo[]> {
   const tracks = await getAllPlaylistTracks(playlistId);
   return tracks.map((track) => ({
     id: track.id,
-    title: track.name,
+    title: cleanSongName(track.name),
     artists: track.artists.map((a) => a.name),
     albumCover: track.album.name,
     previewUrl: track.preview_url,

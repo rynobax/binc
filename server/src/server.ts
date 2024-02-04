@@ -45,7 +45,11 @@ function getClientRoom(roomId: string): ClientRoom {
   return {
     id: roomId,
     name: room.name,
-    users: sortedUsers.map((u) => ({ id: u.id, name: u.name, ready: u.ready })),
+    users: sortedUsers.map((u) => ({
+      id: u.id,
+      name: u.name,
+      ready: u.ready,
+    })),
     status: room.status,
     gameState: room.game.getState(),
   };

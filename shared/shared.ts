@@ -21,17 +21,28 @@ export type GameState =
       songTitle: string;
       artistNames: string[];
       previousSongs: {
+        title: string;
         artistNames: string[];
-        songUrl: string;
         albumArt: string;
       }[];
-      scores: { name: string; score: number }[];
+      scores: {
+        name: string;
+        score: number;
+        guesses: {
+          title: boolean;
+          artist: boolean;
+        };
+      }[];
     };
 
 export interface ClientRoom {
   id: string;
   name: string;
-  users: { id: string; name: string; ready: boolean }[];
+  users: {
+    id: string;
+    name: string;
+    ready: boolean;
+  }[];
   status: RoomStatus;
   gameState: GameState;
 }

@@ -4,6 +4,14 @@ import { store } from "./store";
 import { ClientRoom } from "../../shared/shared";
 import { submitCorrectGuess } from "./websocket";
 import { incorrectMessages } from "./data";
+import {
+  Badge,
+  Flex,
+  ScrollArea,
+  Slider,
+  Text,
+  TextField,
+} from "@radix-ui/themes";
 
 function doStringsMatch(target: string, guess: string) {
   if (target.length < 4)
@@ -12,10 +20,12 @@ function doStringsMatch(target: string, guess: string) {
   return distance <= 3;
 }
 
+const DEFAULT_VOLUME = 50;
+
 function createAudioElement() {
   const el = document.createElement("audio");
   el.preload = "auto";
-  el.volume = 0;
+  el.volume = DEFAULT_VOLUME / 100;
   return el;
 }
 
@@ -24,6 +34,7 @@ interface GameProps {
 }
 
 const Game: React.FC<GameProps> = ({ room }) => {
+  const [volume, setVolume] = useState(DEFAULT_VOLUME);
   const [progress, setProgress] = useState(0);
   const [guessResponse, setGuessResponse] = useState("");
   const [incorrectGuessNdx, setIncorrectGuessNdx] = useState(0);
@@ -79,30 +90,93 @@ const Game: React.FC<GameProps> = ({ room }) => {
         incorrectMessages[incorrectGuessNdx % incorrectMessages.length]
       );
       setIncorrectGuessNdx(incorrectGuessNdx + 1);
+    } else {
+      setGuessResponse("");
     }
   }
 
+  function changeVolume(newVolume: number) {
+    setVolume(newVolume);
+    audioRef.current.volume = newVolume / 100;
+  }
+
   return (
-    <div>
+    <Flex direction="column" gap="8">
+      <Flex style={{ minHeight: 100 }} gap="9">
+        {room.gameState.type !== "paused" && (
+          <>
+            <Flex direction="column" gap="2">
+              {room.gameState.scores.map((user) => (
+                <div>
+                  <Flex gap="2" style={{ minHeight: 0 }}>
+                    <Badge color={user.guesses.title ? "green" : "gray"}>
+                      song
+                    </Badge>
+                    <Badge color={user.guesses.artist ? "green" : "gray"}>
+                      artist
+                    </Badge>
+                    <Text>{user.name}</Text>
+                  </Flex>
+                </div>
+              ))}
+            </Flex>
+            <Flex direction="column" gap="2">
+              <Text size="2" weight="bold">
+                Previous songs
+              </Text>
+              <ScrollArea
+                size="1"
+                type="hover"
+                scrollbars="vertical"
+                style={{ maxHeight: 200 }}
+              >
+                <Flex direction="column" gap="3">
+                  {room.gameState.previousSongs.map((song) => (
+                    <Flex direction="column" gap="0">
+                      <Text size="2">{song.title}</Text>
+                      <Text size="1" weight="medium">
+                        {song.artistNames.join(", ")}
+                      </Text>
+                    </Flex>
+                  ))}
+                </Flex>
+              </ScrollArea>
+            </Flex>
+          </>
+        )}
+      </Flex>
       <div>
-        Current Song
-        <progress value={progress} max="100" />
+        <Text color="ruby" weight="bold">
+          {guessResponse}
+        </Text>
+        <TextField.Root style={{ marginTop: 8 }}>
+          <TextField.Input
+            value={guess}
+            onChange={(e) => {
+              if (room.gameState.type !== "playing") return;
+              setGuess(e.target.value);
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && guess) {
+                processGuess(guess);
+                setGuess("");
+              }
+            }}
+            placeholder="Guess the song or artist!"
+          />
+        </TextField.Root>
+        <progress value={progress} max="100" style={{ width: "100%" }} />
       </div>
       <div>
-        <div>{guessResponse}</div>
-        <input
-          disabled={room.gameState.type !== "playing"}
-          value={guess}
-          onChange={(e) => setGuess(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              processGuess(guess);
-              setGuess("");
-            }
-          }}
+        Volume
+        <Slider
+          value={[volume]}
+          min={0}
+          max={100}
+          onValueChange={(v) => changeVolume(v[0])}
         />
       </div>
-    </div>
+    </Flex>
   );
 };
 
