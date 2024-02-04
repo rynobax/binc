@@ -8,6 +8,6 @@
   },
   "scripts": {
     "stop": "pm2 stop all",
-    "prod": "pm2 start --env production"
+    "prod": "yarn stop && pm2 start --env production"
   }
 }
