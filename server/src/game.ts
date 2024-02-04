@@ -45,6 +45,7 @@ export class Game {
         artistNames: s.artists,
         albumArt: s.albumCover,
         title: s.title,
+        promotionalLink: s.promotionalLink,
       })),
       scores: this.users
         .sort((a, b) => b.score - a.score)

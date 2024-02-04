@@ -7,6 +7,7 @@ import { incorrectMessages } from "./data";
 import {
   Badge,
   Flex,
+  Link,
   ScrollArea,
   Slider,
   Text,
@@ -133,7 +134,9 @@ const Game: React.FC<GameProps> = ({ room }) => {
                 <Flex direction="column" gap="3">
                   {room.gameState.previousSongs.map((song) => (
                     <Flex direction="column" gap="0">
-                      <Text size="2">{song.title}</Text>
+                      <Text size="2">
+                        <Link href={song.promotionalLink}>{song.title}</Link>
+                      </Text>
                       <Text size="1" weight="medium">
                         {song.artistNames.join(", ")}
                       </Text>

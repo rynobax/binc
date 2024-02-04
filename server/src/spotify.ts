@@ -88,5 +88,6 @@ export async function getPlaylistSongInfo(
     artists: track.artists.map((a) => a.name),
     albumCover: track.album.name,
     previewUrl: track.preview_url,
+    promotionalLink: track.external_urls.spotify,
   }));
 }

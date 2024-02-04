@@ -22,6 +22,7 @@ export type GameState =
         title: string;
         artistNames: string[];
         albumArt: string;
+        promotionalLink: string;
       }[];
       scores: {
         name: string;
