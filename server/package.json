@@ -10,6 +10,7 @@
   },
   "dependencies": {},
   "scripts": {
+    "env": "cp ../.env .env",
     "dev": "bun index.ts",
     "prod": "bun --watch index.ts"
   }
