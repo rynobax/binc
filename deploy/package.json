@@ -7,6 +7,7 @@
     "pm2": "^5.3.1"
   },
   "scripts": {
+    "env": "cp ../.env ../client/.env && cp ../.env ../server/.env",
     "stop": "pm2 stop all",
     "prod": "yarn stop && pm2 start --env production"
   }
