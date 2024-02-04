@@ -6,7 +6,7 @@ import {
 } from "../../shared/shared";
 import { generateId } from "./util";
 
-const { WS_SERVER_PORT } = process.env;
+const { VITE_WS_SERVER_HOST: PORT } = process.env;
 
 interface WSContext {
   userId: string;
@@ -40,10 +40,10 @@ export function startServer(handlers: {
       message: handlers.onMessage,
       open: handlers.onOpen,
     },
-    port: WS_SERVER_PORT,
+    port: PORT,
   });
 
-  console.log(`Server running at ws://localhost:${WS_SERVER_PORT}`);
+  console.log(`Server running at ws://localhost:${PORT}`);
 }
 
 export function sendWSMessage(ws: WS, message: ServerToClientMessage) {

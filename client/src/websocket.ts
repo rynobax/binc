@@ -6,6 +6,7 @@ import {
 import { lobbySlice, roomSlice, store } from "./store";
 
 const { WS_SERVER_HOST, WS_SERVER_PORT } = import.meta.env;
+console.log(import.meta.env);
 
 interface SocketConnection {
   send: (msg: ClientToServerMessage) => void;
