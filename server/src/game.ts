@@ -95,7 +95,7 @@ export class Game {
     }
   }
 
-  private reset() {
+  private resetGame() {
     this.songState = "paused";
     this.previousSongs = [];
     this.currentSong = null;
@@ -103,6 +103,10 @@ export class Game {
       u.ready = false;
       u.score = 0;
     });
+  }
+
+  private resetRound() {
+    this.guesses.clear();
   }
 
   public submitUserGuess(userId: string, guess: "title" | "artist") {
@@ -137,10 +141,11 @@ export class Game {
       for (const user of this.users) {
         user.score += this.getUserRoundScore(user.id);
       }
+      this.resetRound();
     }
 
     // reset
-    this.reset();
+    this.resetGame();
     this.broadcast();
   }
 }
