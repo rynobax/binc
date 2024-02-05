@@ -82,7 +82,8 @@ export async function getPlaylistSongInfo(
   playlistId: string
 ): Promise<SongInfo[]> {
   const tracks = await getAllPlaylistTracks(playlistId);
-  return tracks.map((track) => ({
+  const playableTracks = tracks.filter((track) => track.preview_url);
+  return playableTracks.map((track) => ({
     id: track.id,
     title: cleanSongName(track.name),
     artists: track.artists.map((a) => a.name),
