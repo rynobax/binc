@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from "react";
-import "./App.css";
 import Lobby from "./Lobby";
 import { store, useAppSelector, userSlice } from "./store";
 import Room from "./Room";

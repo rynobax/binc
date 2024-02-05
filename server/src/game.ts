@@ -26,10 +26,22 @@ export class Game {
     this.broadcast = broadcast;
   }
 
+  private numCompletedGuesses() {
+    return this.users.reduce((total, user) => {
+      const guess = this.guesses.get(user.id);
+      if (!guess) return total;
+      if (guess.title && guess.artist) return total + 1;
+      return total;
+    }, 0);
+  }
+
   private getUserRoundScore(userId: string) {
     const guess = this.guesses.get(userId);
     if (!guess) return 0;
-    if (guess.title && guess.artist) return 6;
+    if (guess.title && guess.artist) {
+      const bonus = Math.max(0, 3 - this.numCompletedGuesses());
+      return 3 + bonus;
+    }
     if (guess.title || guess.artist) return 1;
     return 0;
   }

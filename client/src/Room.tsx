@@ -19,18 +19,20 @@ const Room: React.FC = () => {
       <Flex direction="column" gap="2">
         {room.gameState.type === "paused" && (
           <Flex gap="9">
-            {room.users.map((user) => (
-              <div key={user.id}>
-                <Flex gap="2">
-                  {user.ready ? (
-                    <Badge color="green">ready</Badge>
-                  ) : (
-                    <Badge color="gray">waiting</Badge>
-                  )}
-                  <Text>{user.name}</Text>
-                </Flex>
-              </div>
-            ))}
+            <Flex gap="2" direction="column">
+              {room.users.map((user) => (
+                <div key={user.id}>
+                  <Flex gap="2">
+                    {user.ready ? (
+                      <Badge color="green">ready</Badge>
+                    ) : (
+                      <Badge color="gray">waiting</Badge>
+                    )}
+                    <Text>{user.name}</Text>
+                  </Flex>
+                </div>
+              ))}
+            </Flex>
             {room.gameState.previousGameScores && (
               <Flex direction="column">
                 <Text weight="bold">Previous Results</Text>
