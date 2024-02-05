@@ -52,6 +52,15 @@ const Game: React.FC<GameProps> = ({ room }) => {
   const [guess, setGuess] = useState("");
   const audioRef = useRef(createAudioElement());
 
+  useEffect(function destroyOnUnmount() {
+    const audioEl = audioRef.current;
+    return () => {
+      audioEl.pause();
+      audioEl.src = "";
+      audioEl.remove();
+    };
+  }, []);
+
   useEffect(() => {
     if (room.gameState.type === "playing") {
       setGuess("");
