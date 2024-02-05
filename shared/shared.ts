@@ -1,5 +1,6 @@
 export interface Env {
   VITE_SERVER_HOST: string;
+  VITE_REDIRECT_URI: string;
   VITE_WEB_SERVER_PORT: string;
   VITE_WS_SERVER_PORT: string;
   VITE_SPOTIFY_CLIENT_ID: string;
