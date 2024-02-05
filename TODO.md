@@ -1,4 +1,3 @@
-should show score
 show round count
 show playlists
 multiple playlists

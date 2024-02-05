@@ -132,7 +132,9 @@ const Game: React.FC<GameProps> = ({ room }) => {
                     >
                       artist
                     </Badge>
-                    <Text>{user.name}</Text>
+                    <Text>
+                      {user.name} ({user.score})
+                    </Text>
                   </Flex>
                 </div>
               ))}
