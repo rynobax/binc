@@ -13,6 +13,7 @@ import {
   Text,
   TextField,
 } from "@radix-ui/themes";
+import { remapToLogScale } from "./util";
 
 function doStringsMatch(target: string, guess: string) {
   if (target.length < 4)
@@ -21,12 +22,21 @@ function doStringsMatch(target: string, guess: string) {
   return distance <= 3;
 }
 
-const DEFAULT_VOLUME = 50;
+const DEFAULT_VOLUME = 30;
+
+function setVolumeOnEl(newVolume: number, audio: HTMLAudioElement) {
+  if (newVolume === 0) {
+    audio.volume = 0;
+    return;
+  }
+  const logVolume = remapToLogScale(newVolume);
+  audio.volume = logVolume / 100;
+}
 
 function createAudioElement() {
   const el = document.createElement("audio");
   el.preload = "auto";
-  el.volume = DEFAULT_VOLUME / 100;
+  setVolumeOnEl(DEFAULT_VOLUME, el);
   return el;
 }
 
@@ -98,7 +108,7 @@ const Game: React.FC<GameProps> = ({ room }) => {
 
   function changeVolume(newVolume: number) {
     setVolume(newVolume);
-    audioRef.current.volume = newVolume / 100;
+    setVolumeOnEl(newVolume, audioRef.current);
   }
 
   return (

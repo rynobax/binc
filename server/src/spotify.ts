@@ -83,6 +83,14 @@ export async function getPlaylistSongInfo(
 ): Promise<SongInfo[]> {
   const tracks = await getAllPlaylistTracks(playlistId);
   const playableTracks = tracks.filter((track) => track.preview_url);
+  const numPlayableTracks = playableTracks.length;
+  const numTracks = tracks.length;
+  const pctPlayable = (numPlayableTracks / numTracks) * 100;
+  console.log(
+    `Playlist has ${numTracks} tracks, of which ${numPlayableTracks} are playable (${pctPlayable.toFixed(
+      2
+    )}%)`
+  );
   return playableTracks.map((track) => ({
     id: track.id,
     title: cleanSongName(track.name),
