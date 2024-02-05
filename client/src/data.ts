@@ -69,4 +69,5 @@ export const defaultPlaylists: DefaultPlaylist[] = [
   { name: "Every Billboard #1", id: "6eXlxttw7urdPUDEavpT17" },
   { name: "Classic Rock", id: "4cVibuAVfrfiwwZaHGpBzd" },
   { name: "All Time Rap Hits", id: "7GjUYpEYbpQ6lMiGxLVCJQ" },
-];
+  { name: "Billions Club", id: "37i9dQZF1DX7iB3RCnBnN4" },
+].sort((a, b) => a.name.localeCompare(b.name));
