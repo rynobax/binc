@@ -49,7 +49,7 @@ export class Game {
   public getState(): GameState {
     if (this.songState === "paused") {
       const previousGameScores = this.getScores();
-      const previousGameScoresAreAllZero = !previousGameScores.every(
+      const previousGameScoresAreAllZero = previousGameScores.every(
         (s) => s.score === 0
       );
       return {
