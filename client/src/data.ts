@@ -54,3 +54,19 @@ export const incorrectMessages = shuffle([
   "Неправильний",
   "غلط",
 ]);
+
+interface DefaultPlaylist {
+  name: string;
+  id: string;
+}
+
+export const defaultPlaylists: DefaultPlaylist[] = [
+  { name: "Top 50 - USA", id: "37i9dQZEVXbLRQDuF5jeBp" },
+  { name: "RapCaviar", id: "37i9dQZF1DX0XUsuxWHRQd" },
+  { name: "Today's Top Hits", id: "37i9dQZF1DXcBWIGoYBM5M" },
+  { name: "Billboard Hot 100", id: "6UeSakyzhiEt4NB3UAd6NQ" },
+  { name: "Billboard #1s 2000 - Today", id: "5sUksHiPlavLs0dnDqvFgJ" },
+  { name: "Every Billboard #1", id: "6eXlxttw7urdPUDEavpT17" },
+  { name: "Classic Rock", id: "4cVibuAVfrfiwwZaHGpBzd" },
+  { name: "All Time Rap Hits", id: "7GjUYpEYbpQ6lMiGxLVCJQ" },
+];
