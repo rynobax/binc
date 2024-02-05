@@ -120,10 +120,16 @@ const Game: React.FC<GameProps> = ({ room }) => {
               {room.gameState.scores.map((user) => (
                 <div>
                   <Flex gap="2" style={{ minHeight: 0 }}>
-                    <Badge color={user.guesses.title ? "green" : "gray"}>
+                    <Badge
+                      color={user.guesses.title ? "green" : "gray"}
+                      variant={user.guesses.title ? "solid" : "soft"}
+                    >
                       song
                     </Badge>
-                    <Badge color={user.guesses.artist ? "green" : "gray"}>
+                    <Badge
+                      color={user.guesses.artist ? "green" : "gray"}
+                      variant={user.guesses.artist ? "solid" : "soft"}
+                    >
                       artist
                     </Badge>
                     <Text>{user.name}</Text>
