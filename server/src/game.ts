@@ -120,7 +120,7 @@ export class Game {
   }
 
   private async start() {
-    const songsToUse = shuffle(Array.from(this.songIds).slice(0, GAME_LENGTH));
+    const songsToUse = shuffle(Array.from(this.songIds)).slice(0, GAME_LENGTH);
     console.log("Starting game with songs: ", songsToUse);
     for (const songId of songsToUse) {
       // broad cast next song with queued
