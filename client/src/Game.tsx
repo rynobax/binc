@@ -88,7 +88,7 @@ const Game: React.FC<GameProps> = ({ room }) => {
         const audioCurrentTime = audioRef.current.currentTime;
         setProgress((audioCurrentTime / audioDuration) * 100);
       }
-    }, 1000);
+    }, 200);
     return () => clearInterval(interval);
   }, []);
 
