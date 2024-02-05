@@ -16,7 +16,7 @@ const Room: React.FC = () => {
       <Heading as="h1" align="center">
         {room.name}
       </Heading>
-      <Flex direction="column">
+      <Flex direction="column" gap="2">
         {room.gameState.type === "paused" &&
           room.users.map((user) => (
             <Flex gap="2">
