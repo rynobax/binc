@@ -1,3 +1,4 @@
+import { shuffle } from "../../shared/shared";
 import type {
   GetPlaylistTracksResponse,
   SongInfo,
@@ -105,12 +106,17 @@ export async function getPlaylistSongInfo(
       `${pctPlayable}% of tracks are playable (${numPlayableTracks}/${numTracks})`
     );
   }
-  return playableTracks.map((track) => ({
-    id: track.id,
-    title: cleanSongName(track.name),
-    artists: track.artists.map((a) => a.name),
-    albumCover: track.album.name,
-    previewUrl: track.preview_url,
-    promotionalLink: track.external_urls.spotify,
-  }));
+  return (
+    shuffle(playableTracks)
+      // TODO: REMOVE THIS
+      .slice(20)
+      .map((track) => ({
+        id: track.id,
+        title: cleanSongName(track.name),
+        artists: track.artists.map((a) => a.name),
+        albumCover: track.album.name,
+        previewUrl: track.preview_url,
+        promotionalLink: track.external_urls.spotify,
+      }))
+  );
 }
