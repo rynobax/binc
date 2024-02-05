@@ -35,7 +35,7 @@ const Room: React.FC = () => {
               <Flex direction="column">
                 <Text weight="bold">Previous Results</Text>
                 {room.gameState.previousGameScores.map((user) => (
-                  <Flex gap="2">
+                  <Flex gap="2" key={user.name}>
                     <Text>
                       {user.score} - {user.name}
                     </Text>

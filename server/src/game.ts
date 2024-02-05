@@ -107,7 +107,7 @@ export class Game {
   }
 
   private startIfNeeded() {
-    if (this.users.length > 1 && this.users.every((u) => u.ready)) {
+    if (this.users.length > 0 && this.users.every((u) => u.ready)) {
       this.start();
     }
   }

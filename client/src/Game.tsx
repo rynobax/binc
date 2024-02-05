@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import levy from "js-levenshtein";
-import { store } from "./store";
+import { store, useAppSelector, userSlice } from "./store";
 import { ClientRoom } from "../../shared/shared";
 import { submitCorrectGuess } from "./websocket";
 import { incorrectMessages } from "./data";
@@ -45,7 +45,8 @@ interface GameProps {
 }
 
 const Game: React.FC<GameProps> = ({ room }) => {
-  const [volume, setVolume] = useState(DEFAULT_VOLUME);
+  const savedVolume = useAppSelector((state) => state.user.volume);
+  const [volume, setVolume] = useState(savedVolume ?? DEFAULT_VOLUME);
   const [progress, setProgress] = useState(0);
   const [guessResponse, setGuessResponse] = useState("");
   const [incorrectGuessNdx, setIncorrectGuessNdx] = useState(0);
@@ -131,7 +132,7 @@ const Game: React.FC<GameProps> = ({ room }) => {
                 {room.gameState.totalRounds}
               </Text>
               {room.gameState.scores.map((user) => (
-                <div>
+                <div key={user.name}>
                   <Flex gap="2" style={{ minHeight: 0 }}>
                     <Badge
                       color={user.guesses.title ? "green" : "gray"}
@@ -210,6 +211,9 @@ const Game: React.FC<GameProps> = ({ room }) => {
           min={0}
           max={100}
           onValueChange={(v) => changeVolume(v[0])}
+          onValueCommit={(v) => {
+            store.dispatch(userSlice.actions.setVolume(v[0]));
+          }}
         />
       </div>
     </Flex>

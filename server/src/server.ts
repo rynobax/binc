@@ -36,9 +36,9 @@ function getLobby(): Lobby {
   };
 }
 
-function getClientRoom(roomId: string): ClientRoom {
+function getClientRoom(roomId: string): ClientRoom | null {
   const room = rooms.get(roomId);
-  if (!room) throw new Error("Room not found");
+  if (!room) return null;
   const sortedUsers = room.game.users.sort((a, b) =>
     a.name.localeCompare(b.name)
   );

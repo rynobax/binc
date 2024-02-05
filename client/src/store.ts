@@ -10,6 +10,7 @@ interface User {
     token: string;
     expiresAt: number;
   };
+  volume?: number;
 }
 
 export const userSlice = createSlice({
@@ -23,6 +24,9 @@ export const userSlice = createSlice({
     },
     setSpotifyToken(state, action: PayloadAction<User["spotifyToken"]>) {
       state.spotifyToken = action.payload;
+    },
+    setVolume(state, action: PayloadAction<number>) {
+      state.volume = action.payload;
     },
   },
 });
