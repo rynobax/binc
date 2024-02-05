@@ -57,6 +57,8 @@ export class Game {
           };
         }),
       songUrl: this.currentSong.previewUrl,
+      totalRounds: GAME_LENGTH,
+      currentRound: this.previousSongs.length + 1,
     };
   }
 

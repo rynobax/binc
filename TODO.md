@@ -1,4 +1,3 @@
-show round count
 show playlists
 multiple playlists
 artist not resetting between songs

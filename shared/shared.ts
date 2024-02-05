@@ -32,6 +32,8 @@ export type GameState =
           artist: boolean;
         };
       }[];
+      currentRound: number;
+      totalRounds: number;
     };
 
 export interface ClientRoom {

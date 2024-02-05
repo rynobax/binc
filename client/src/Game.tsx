@@ -117,6 +117,10 @@ const Game: React.FC<GameProps> = ({ room }) => {
         {room.gameState.type !== "paused" && (
           <>
             <Flex direction="column" gap="2">
+              <Text size="2" weight="bold">
+                Round {room.gameState.currentRound} of{" "}
+                {room.gameState.totalRounds}
+              </Text>
               {room.gameState.scores.map((user) => (
                 <div>
                   <Flex gap="2" style={{ minHeight: 0 }}>
