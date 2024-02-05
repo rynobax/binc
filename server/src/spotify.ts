@@ -78,13 +78,9 @@ async function getAllPlaylistTracks(playlistId: string) {
 }
 
 function cleanSongName(name: string) {
-  return (
-    name
-      // feat
-      .replace(/\s\(feat\. .+\)$/, "")
-    // remastered
-    // .replace(/\s-\sRemastered$/, "")
-  );
+  const withoutParen = name.split(" (")[0];
+  const withoutDash = withoutParen.split(" - ")[0];
+  return withoutDash;
 }
 
 export async function getPlaylistSongInfo(
