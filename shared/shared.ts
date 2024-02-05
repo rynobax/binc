@@ -20,7 +20,10 @@ export interface Lobby {
 }
 
 export type GameState =
-  | { type: "paused" }
+  | {
+      type: "paused";
+      previousGameScores: { name: string; score: number }[] | null;
+    }
   | {
       type: "queued" | "playing";
       songUrl: string;

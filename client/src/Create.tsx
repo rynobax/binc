@@ -45,7 +45,7 @@ const Create: React.FC<CreateProps> = () => {
                 (p) => p.id === playlistId
               )?.name;
               return (
-                <Flex gap="2" align="center">
+                <Flex gap="2" align="center" key={i}>
                   <IconButton
                     color="red"
                     variant="soft"
@@ -84,7 +84,11 @@ const Create: React.FC<CreateProps> = () => {
                     <DropdownMenu.Item
                       key={playlist.id}
                       onSelect={() => {
-                        const newPlaylistIds = [...playlistIds];
+                        const isEmptyState =
+                          playlistIds.length === 1 && playlistIds[0] === "";
+                        const newPlaylistIds = isEmptyState
+                          ? []
+                          : [...playlistIds];
                         newPlaylistIds.push(playlist.id);
                         setPlaylistIds(newPlaylistIds);
                       }}

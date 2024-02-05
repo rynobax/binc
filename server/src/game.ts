@@ -34,8 +34,31 @@ export class Game {
     return 0;
   }
 
+  private getScores() {
+    return this.users
+      .sort((a, b) => b.score - a.score)
+      .map((u) => {
+        return {
+          name: u.name,
+          score: u.score + this.getUserRoundScore(u.id),
+          guesses: this.guesses.get(u.id) || { title: false, artist: false },
+        };
+      });
+  }
+
   public getState(): GameState {
-    if (this.songState === "paused") return { type: "paused" };
+    if (this.songState === "paused") {
+      const previousGameScores = this.getScores();
+      const previousGameScoresAreAllZero = !previousGameScores.every(
+        (s) => s.score === 0
+      );
+      return {
+        type: "paused",
+        previousGameScores: previousGameScoresAreAllZero
+          ? null
+          : this.getScores(),
+      };
+    }
     if (!this.currentSong) throw new Error("No current song");
     return {
       type: this.songState,
@@ -47,15 +70,7 @@ export class Game {
         title: s.title,
         promotionalLink: s.promotionalLink,
       })),
-      scores: this.users
-        .sort((a, b) => b.score - a.score)
-        .map((u) => {
-          return {
-            name: u.name,
-            score: u.score + this.getUserRoundScore(u.id),
-            guesses: this.guesses.get(u.id) || { title: false, artist: false },
-          };
-        }),
+      scores: this.getScores(),
       songUrl: this.currentSong.previewUrl,
       totalRounds: GAME_LENGTH,
       currentRound: this.previousSongs.length + 1,
@@ -92,19 +107,22 @@ export class Game {
   }
 
   private startIfNeeded() {
-    if (this.users.every((u) => u.ready)) {
+    if (this.users.length > 1 && this.users.every((u) => u.ready)) {
       this.start();
     }
+  }
+
+  private resetScores() {
+    this.users.forEach((u) => {
+      u.ready = false;
+      u.score = 0;
+    });
   }
 
   private resetGame() {
     this.songState = "paused";
     this.previousSongs = [];
     this.currentSong = null;
-    this.users.forEach((u) => {
-      u.ready = false;
-      u.score = 0;
-    });
   }
 
   private resetRound() {
@@ -122,6 +140,7 @@ export class Game {
   }
 
   private async start() {
+    this.resetScores();
     const songsToUse = shuffle(Array.from(this.songIds)).slice(0, GAME_LENGTH);
     console.log("Starting game with songs: ", songsToUse);
     for (const songId of songsToUse) {

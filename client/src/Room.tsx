@@ -17,17 +17,34 @@ const Room: React.FC = () => {
         {room.name}
       </Heading>
       <Flex direction="column" gap="2">
-        {room.gameState.type === "paused" &&
-          room.users.map((user) => (
-            <Flex gap="2">
-              {user.ready ? (
-                <Badge color="green">ready</Badge>
-              ) : (
-                <Badge color="gray">waiting</Badge>
-              )}
-              <Text>{user.name}</Text>
-            </Flex>
-          ))}
+        {room.gameState.type === "paused" && (
+          <Flex gap="9">
+            {room.users.map((user) => (
+              <div key={user.id}>
+                <Flex gap="2">
+                  {user.ready ? (
+                    <Badge color="green">ready</Badge>
+                  ) : (
+                    <Badge color="gray">waiting</Badge>
+                  )}
+                  <Text>{user.name}</Text>
+                </Flex>
+              </div>
+            ))}
+            {room.gameState.previousGameScores && (
+              <Flex direction="column">
+                <Text weight="bold">Previous Results</Text>
+                {room.gameState.previousGameScores.map((user) => (
+                  <Flex gap="2">
+                    <Text>
+                      {user.score} - {user.name}
+                    </Text>
+                  </Flex>
+                ))}
+              </Flex>
+            )}
+          </Flex>
+        )}
       </Flex>
       {room.gameState.type === "paused" ? (
         <>{!self.ready && <Button onClick={readyUp}>Ready</Button>}</>
