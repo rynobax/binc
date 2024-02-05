@@ -7,3 +7,4 @@ higher contrast for success
 selecting same songs
 kill music after leaving room
 new tab for link
+(Remastered)

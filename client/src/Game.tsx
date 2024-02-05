@@ -145,7 +145,9 @@ const Game: React.FC<GameProps> = ({ room }) => {
                   {room.gameState.previousSongs.map((song) => (
                     <Flex direction="column" gap="0">
                       <Text size="2">
-                        <Link href={song.promotionalLink}>{song.title}</Link>
+                        <Link href={song.promotionalLink} target="_blank">
+                          {song.title}
+                        </Link>
                       </Text>
                       <Text size="1" weight="medium">
                         {song.artistNames.join(", ")}

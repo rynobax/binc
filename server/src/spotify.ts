@@ -62,6 +62,9 @@ const getPlaylistTracks = (playlistId: string, offset: number) =>
     `playlists/${playlistId}/tracks?offset=${offset}&limit=50`
   );
 
+const getTrackById = (trackId: string) =>
+  querySpotify<SpotifyTrack>(`tracks/${trackId}`);
+
 async function getAllPlaylistTracks(playlistId: string) {
   const tracks: SpotifyTrack[] = [];
   let offset = 0;
@@ -75,7 +78,13 @@ async function getAllPlaylistTracks(playlistId: string) {
 }
 
 function cleanSongName(name: string) {
-  return name.replace(/\s\(feat\. .+\)$/, "");
+  return (
+    name
+      // feat
+      .replace(/\s\(feat\. .+\)$/, "")
+    // remastered
+    // .replace(/\s-\sRemastered$/, "")
+  );
 }
 
 export async function getPlaylistSongInfo(
@@ -83,6 +92,7 @@ export async function getPlaylistSongInfo(
 ): Promise<SongInfo[]> {
   const tracks = await getAllPlaylistTracks(playlistId);
   const playableTracks = tracks.filter((track) => track.preview_url);
+  const unplayableTracks = tracks.filter((track) => !track.preview_url);
   const numPlayableTracks = playableTracks.length;
   const numTracks = tracks.length;
   const pctPlayable = (numPlayableTracks / numTracks) * 100;
@@ -91,6 +101,9 @@ export async function getPlaylistSongInfo(
       2
     )}%)`
   );
+  for (const track of unplayableTracks) {
+    // TODO: Use client auth to request tracks
+  }
   return playableTracks.map((track) => ({
     id: track.id,
     title: cleanSongName(track.name),
