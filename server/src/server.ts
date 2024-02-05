@@ -20,6 +20,7 @@ interface ServerRoom {
   playlistIds: string[];
   status: RoomStatus;
   game: Game;
+  clientAccessToken: string;
 }
 
 const rooms = new Map<string, ServerRoom>();
@@ -92,6 +93,7 @@ async function handleCreateRoom(message: CreateRoomMessage) {
       playlistIds: message.playlistIds,
       status: "creating",
       game,
+      clientAccessToken: message.accessToken,
     };
     rooms.set(roomId, room);
 
@@ -99,7 +101,7 @@ async function handleCreateRoom(message: CreateRoomMessage) {
     globalUpdateLobby();
 
     for (const playlist of message.playlistIds) {
-      const tracks = await getPlaylistSongInfo(playlist);
+      const tracks = await getPlaylistSongInfo(playlist, message.accessToken);
       for (const track of tracks) {
         songs.set(track.id, track);
         game.addSongs([track.id]);

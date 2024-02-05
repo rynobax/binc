@@ -1,3 +1,11 @@
+export interface Env {
+  VITE_SERVER_HOST: string;
+  VITE_WEB_SERVER_PORT: string;
+  VITE_WS_SERVER_PORT: string;
+  VITE_SPOTIFY_CLIENT_ID: string;
+  SPOTIFY_CLIENT_SECRET: string;
+}
+
 export type RoomStatus = "creating" | "ready" | "playing";
 
 export interface LobbyRoom {
@@ -59,6 +67,7 @@ export interface CreateRoomMessage {
   type: "create-room";
   name: string;
   playlistIds: string[];
+  accessToken: string;
 }
 
 export interface JoinRoomMessage {

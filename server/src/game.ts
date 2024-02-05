@@ -63,6 +63,8 @@ export class Game {
   }
 
   public addUser(user: Omit<GameUser, "ready" | "score">) {
+    const userIsAlreadyInGame = this.users.some((u) => u.id === user.id);
+    if (userIsAlreadyInGame) return;
     this.users.push({ ...user, ready: false, score: 0 });
   }
 

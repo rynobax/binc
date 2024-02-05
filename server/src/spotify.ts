@@ -47,30 +47,37 @@ async function handleResponse(response: Response) {
   return response.json();
 }
 
-async function querySpotify<T>(query: string) {
+async function querySpotify<T>(query: string, clientToken: string) {
   const URL = `https://api.spotify.com/v1/${query}`;
+  console.log(clientToken);
   const response = await fetch(URL, {
     headers: {
-      Authorization: `Bearer ${await token}`,
+      // Authorization: `Bearer ${await token}`,
+      Authorization: `Bearer ${clientToken}`,
     },
   });
   return handleResponse(response) as T;
 }
 
-const getPlaylistTracks = (playlistId: string, offset: number) =>
+const getPlaylistTracks = (
+  playlistId: string,
+  offset: number,
+  clientToken: string
+) =>
   querySpotify<GetPlaylistTracksResponse>(
-    `playlists/${playlistId}/tracks?offset=${offset}&limit=50`
+    `playlists/${playlistId}/tracks?offset=${offset}&limit=50`,
+    clientToken
   );
 
-const getTrackById = (trackId: string) =>
-  querySpotify<SpotifyTrack>(`tracks/${trackId}`);
+const getTrackById = (trackId: string, clientToken: string) =>
+  querySpotify<SpotifyTrack>(`tracks/${trackId}`, clientToken);
 
-async function getAllPlaylistTracks(playlistId: string) {
+async function getAllPlaylistTracks(playlistId: string, clientToken: string) {
   const tracks: SpotifyTrack[] = [];
   let offset = 0;
   let response: GetPlaylistTracksResponse;
   do {
-    response = await getPlaylistTracks(playlistId, offset);
+    response = await getPlaylistTracks(playlistId, offset, clientToken);
     tracks.push(...response.items.map((i) => i.track));
     offset += response.items.length;
   } while (response.next);
@@ -84,21 +91,19 @@ function cleanSongName(name: string) {
 }
 
 export async function getPlaylistSongInfo(
-  playlistId: string
+  playlistId: string,
+  clientToken: string
 ): Promise<SongInfo[]> {
-  const tracks = await getAllPlaylistTracks(playlistId);
+  const tracks = await getAllPlaylistTracks(playlistId, clientToken);
   const playableTracks = tracks.filter((track) => track.preview_url);
   const unplayableTracks = tracks.filter((track) => !track.preview_url);
   const numPlayableTracks = playableTracks.length;
   const numTracks = tracks.length;
   const pctPlayable = (numPlayableTracks / numTracks) * 100;
-  console.log(
-    `Playlist has ${numTracks} tracks, of which ${numPlayableTracks} are playable (${pctPlayable.toFixed(
-      2
-    )}%)`
-  );
-  for (const track of unplayableTracks) {
-    // TODO: Use client auth to request tracks
+  if (unplayableTracks.length > 0) {
+    console.log(
+      `${pctPlayable}% of tracks are playable (${numPlayableTracks}/${numTracks})`
+    );
   }
   return playableTracks.map((track) => ({
     id: track.id,

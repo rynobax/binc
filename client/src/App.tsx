@@ -1,15 +1,42 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import "./App.css";
 import Lobby from "./Lobby";
 import { store, useAppSelector, userSlice } from "./store";
 import Room from "./Room";
 import Create from "./Create";
 import { Button, Flex, Heading, TextFieldInput } from "@radix-ui/themes";
+import { getAccessToken } from "./login";
+
+async function handleOAuthCallback() {
+  console.log(window.location.search);
+  const queryParams = Array.from(
+    new URLSearchParams(window.location.search).entries()
+  );
+  for (const [key, value] of queryParams) {
+    if (key === "code") {
+      getAccessToken(value).then((result) =>
+        store.dispatch(userSlice.actions.setSpotifyToken(result))
+      );
+    }
+  }
+}
 
 function App() {
-  const [nameConfirmed, setNameConfirmed] = useState(false);
+  const userName = useAppSelector((state) => state.user.name);
+  const [nameConfirmed, setNameConfirmed] = useState(!!userName);
   const username = useAppSelector((state) => state.user.name);
   const inRoom = useAppSelector((state) => state.room.room);
+
+  const handling = useRef(false);
+  useEffect(function onPageLoad() {
+    if (handling.current) return;
+    handling.current = true;
+    if (window.location.pathname === "/callback") {
+      handleOAuthCallback();
+      window.history.replaceState({}, document.title, "/");
+    }
+  }, []);
+
   if (!nameConfirmed) {
     return (
       <Flex gap="5">
@@ -39,6 +66,15 @@ function App() {
         <Create />
         <Lobby />
       </Flex>
+      <Button
+        color="violet"
+        variant="soft"
+        onClick={() => {
+          setNameConfirmed(false);
+        }}
+      >
+        Change Name
+      </Button>
     </Flex>
   );
 }

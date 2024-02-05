@@ -2,14 +2,27 @@ import { createSlice, configureStore, PayloadAction } from "@reduxjs/toolkit";
 import { ClientRoom, Lobby } from "../../shared/shared";
 import { useDispatch, TypedUseSelectorHook, useSelector } from "react-redux";
 
+const STATE_VERSION = String(1);
+
+interface User {
+  name: string;
+  spotifyToken?: {
+    token: string;
+    expiresAt: number;
+  };
+}
+
 export const userSlice = createSlice({
   name: "user",
   initialState: {
     name: "",
-  } as { name: string },
+  } as User,
   reducers: {
     setName(state, action: PayloadAction<string>) {
       state.name = action.payload;
+    },
+    setSpotifyToken(state, action: PayloadAction<User["spotifyToken"]>) {
+      state.spotifyToken = action.payload;
     },
   },
 });
@@ -39,13 +52,39 @@ export const roomSlice = createSlice({
   },
 });
 
+const preloadedState = ((): unknown => {
+  const state = localStorage.getItem("state");
+  if (!state) return {};
+  const { version, ...rest } = JSON.parse(state);
+  if (version !== STATE_VERSION) return {};
+  const userTokenIsExpired =
+    rest.user.spotifyToken?.expiresAt < Date.now() + 1000 * 60 * 5;
+  if (userTokenIsExpired) {
+    rest.user.spotifyToken = undefined;
+  }
+  return rest;
+})();
+
 export const store = configureStore({
   reducer: {
     lobby: lobbySlice.reducer,
     user: userSlice.reducer,
     room: roomSlice.reducer,
   },
+  preloadedState,
 });
+
+let lastUser: User | null = null;
+setInterval(() => {
+  const currentState = store.getState().user;
+  if (lastUser === currentState) return;
+  lastUser = currentState;
+  const stateToSave: Partial<RootState> & { version: string } = {
+    version: STATE_VERSION,
+    user: store.getState().user,
+  };
+  localStorage.setItem("state", JSON.stringify(stateToSave));
+}, 10000);
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 (window as any).store = store;

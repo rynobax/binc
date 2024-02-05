@@ -4,9 +4,7 @@ import {
   ServerToClientMessage,
 } from "../../shared/shared";
 import { lobbySlice, roomSlice, store } from "./store";
-
-const { VITE_WS_SERVER_HOST: HOST, VITE_WS_SERVER_PORT: PORT } = import.meta
-  .env;
+import env from "./env";
 
 interface SocketConnection {
   send: (msg: ClientToServerMessage) => void;
@@ -14,7 +12,9 @@ interface SocketConnection {
 
 const connect = (function () {
   return new Promise<SocketConnection>((resolve) => {
-    const socket = new ReconnectingWebSocket(`ws://${HOST}:${PORT}`);
+    const socket = new ReconnectingWebSocket(
+      `ws://${env.VITE_SERVER_HOST}:${env.VITE_WS_SERVER_PORT}`
+    );
 
     // Event listener to be called when the WebSocket connection is opened
     socket.addEventListener("open", function () {
@@ -55,10 +55,13 @@ const connect = (function () {
 
 export async function startRoom(name: string, playlistIds: string[]) {
   const socket = await connect;
+  const accessToken = store.getState().user.spotifyToken?.token;
+  if (!accessToken) throw new Error("No access token found");
   socket.send({
     name,
     playlistIds,
     type: "create-room",
+    accessToken,
   });
 }
 
