@@ -1,3 +1,4 @@
+import { sha256 } from "js-sha256";
 import env from "./env";
 
 const redirect_uri = `http://${env.VITE_SERVER_HOST}:${env.VITE_WEB_SERVER_PORT}/callback`;
@@ -66,7 +67,7 @@ function generateCodeVerifier(length: number) {
 
 async function generateCodeChallenge(codeVerifier: string) {
   const data = new TextEncoder().encode(codeVerifier);
-  const digest = await window.crypto.subtle.digest("SHA-256", data);
+  const digest = sha256.digest(data);
   return btoa(String.fromCharCode.apply(null, [...new Uint8Array(digest)]))
     .replace(/\+/g, "-")
     .replace(/\//g, "_")
