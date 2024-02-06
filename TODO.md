@@ -15,6 +15,7 @@ remove garbage from title
 cheat code
 remove text on round start not working
 chat room
+refresh my client oauth token
 
 more testing on songs
 
