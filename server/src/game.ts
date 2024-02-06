@@ -13,6 +13,12 @@ interface GameUser {
   score: number;
 }
 
+interface Guess {
+  title: boolean;
+  artist: boolean;
+  time: number;
+}
+
 export class Game {
   public users: GameUser[] = [];
   private songIds: Set<string> = new Set();
@@ -20,17 +26,18 @@ export class Game {
   private songState: "queued" | "playing" | "paused" = "paused";
   private currentSong: SongInfo | null = null;
   private previousSongs: SongInfo[] = [];
-  private guesses = new Map<string, { title: boolean; artist: boolean }>();
+  private guesses = new Map<string, Guess>();
 
   constructor(broadcast: () => void) {
     this.broadcast = broadcast;
   }
 
-  private numCompletedGuesses() {
+  private numPeopleWhoGuessedBefore(guessTime: number) {
     return this.users.reduce((total, user) => {
       const guess = this.guesses.get(user.id);
       if (!guess) return total;
-      if (guess.title && guess.artist) return total + 1;
+      if (guess.title && guess.artist && guess.time < guessTime)
+        return total + 1;
       return total;
     }, 0);
   }
@@ -39,7 +46,7 @@ export class Game {
     const guess = this.guesses.get(userId);
     if (!guess) return 0;
     if (guess.title && guess.artist) {
-      const bonus = Math.max(0, 3 - this.numCompletedGuesses());
+      const bonus = Math.max(0, 3 - this.numPeopleWhoGuessedBefore(guess.time));
       return 3 + bonus;
     }
     if (guess.title || guess.artist) return 1;
@@ -142,11 +149,13 @@ export class Game {
   }
 
   public submitUserGuess(userId: string, guess: "title" | "artist") {
-    const newGuess = this.guesses.get(userId) || {
+    const newGuess: Guess = this.guesses.get(userId) || {
       title: false,
       artist: false,
+      time: Date.now(),
     };
     newGuess[guess] = true;
+    newGuess.time = Date.now();
     this.guesses.set(userId, newGuess);
     this.broadcast();
   }
