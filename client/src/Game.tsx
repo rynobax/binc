@@ -72,8 +72,10 @@ const Game: React.FC<GameProps> = ({ room }) => {
 
   useEffect(() => {
     if (room.gameState.type === "paused") return;
-    if (audioRef.current.src !== room.gameState.songUrl) {
-      audioRef.current.src = room.gameState.songUrl;
+    const currentSongUrl = room.gameState.currentSong?.url;
+    if (!currentSongUrl) return;
+    if (audioRef.current.src !== currentSongUrl) {
+      audioRef.current.src = currentSongUrl;
       audioRef.current.load();
     }
     if (room.gameState.type === "playing") audioRef.current.play();
@@ -96,15 +98,17 @@ const Game: React.FC<GameProps> = ({ room }) => {
 
   function processGuess(attemptedGuess: string) {
     if (room.gameState.type === "paused") return;
+    const { currentSong } = room.gameState;
+    if (!currentSong) return;
     let correct = false;
-    if (doStringsMatch(room.gameState.songTitle, attemptedGuess)) {
+    if (doStringsMatch(currentSong.title, attemptedGuess)) {
       correct = true;
-      submitCorrectGuess("title");
+      submitCorrectGuess(currentSong.id, "title");
     }
-    for (const artist of room.gameState.artistNames) {
+    for (const artist of currentSong.artistNames) {
       if (doStringsMatch(artist, attemptedGuess)) {
         correct = true;
-        submitCorrectGuess("artist");
+        submitCorrectGuess(currentSong.id, "artist");
         break;
       }
     }

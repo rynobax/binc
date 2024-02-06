@@ -8,7 +8,6 @@ people missing
 volume wrong at start
 https
 if someone leaves the game will not stop
-submitting artist race condition (include song id)
 p.i.m.p.
 better 4 letter word
 first half = more points

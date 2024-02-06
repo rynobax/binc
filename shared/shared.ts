@@ -44,9 +44,12 @@ export interface PausedGameState {
 
 export interface RunningGameState {
   type: "queued" | "playing";
-  songUrl: string;
-  songTitle: string;
-  artistNames: string[];
+  currentSong: {
+    id: string;
+    url: string;
+    title: string;
+    artistNames: string[];
+  } | null;
   previousSongs: PreviousSong[];
   scores: GameScore[];
   roundStartTime: number;
@@ -98,6 +101,7 @@ export interface ReadyMessage {
 
 export interface GuessMessage {
   type: "guess";
+  songId: string;
   guess: "title" | "artist";
 }
 

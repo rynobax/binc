@@ -88,10 +88,14 @@ export async function readyUp() {
   });
 }
 
-export async function submitCorrectGuess(guess: "title" | "artist") {
+export async function submitCorrectGuess(
+  songId: string,
+  guess: "title" | "artist"
+) {
   const socket = await connect;
   socket.send({
     type: "guess",
+    songId,
     guess,
   });
 }

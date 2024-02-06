@@ -95,14 +95,18 @@ export class Game {
         previousSongs,
       };
     }
-    if (!this.currentSong) throw new Error("No current song");
     return {
       type: this.songState,
-      artistNames: this.currentSong.artists,
-      songTitle: this.currentSong.title,
+      currentSong: this.currentSong
+        ? {
+            id: this.currentSong.id,
+            url: this.currentSong.previewUrl,
+            title: this.currentSong.title,
+            artistNames: this.currentSong.artists,
+          }
+        : null,
       previousSongs,
       scores: this.getScores(),
-      songUrl: this.currentSong.previewUrl,
       roundStartTime: this.roundStartTime,
       totalRounds: GAME_LENGTH,
       currentRound: this.previousSongs.length + 1,
@@ -160,7 +164,12 @@ export class Game {
     this.guesses.clear();
   }
 
-  public submitUserGuess(userId: string, guess: "title" | "artist") {
+  public submitUserGuess(
+    userId: string,
+    songId: string,
+    guess: "title" | "artist"
+  ) {
+    if (this.currentSong?.id !== songId) return;
     const newGuess: Guess = this.guesses.get(userId) || NEW_GUESS();
     newGuess[guess] = Date.now();
     this.guesses.set(userId, newGuess);
@@ -189,6 +198,7 @@ export class Game {
       this.previousSongs.unshift(song);
 
       // score round
+      this.currentSong = null;
       for (const user of this.users) {
         user.score += this.getUserRoundScore(user.id);
       }
