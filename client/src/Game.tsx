@@ -163,9 +163,8 @@ const Game: React.FC<GameProps> = ({ room }) => {
                           user.guesses.artist
                         )}
                       </Badge>
-                      <Text>
-                        {user.name} ({user.score})
-                      </Text>
+                      <Text weight="bold">{user.name} </Text>
+                      <Text>({user.score})</Text>
                     </Flex>
                   </div>
                 );
