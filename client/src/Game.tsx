@@ -65,7 +65,7 @@ const Game: React.FC<GameProps> = ({ room }) => {
   }, []);
 
   useEffect(() => {
-    if (room.gameState.type === "playing") {
+    if (room.gameState.type === "paused") {
       setGuess("");
     }
   }, [room.gameState.type]);
