@@ -1,6 +1,7 @@
 import { createSlice, configureStore, PayloadAction } from "@reduxjs/toolkit";
 import { ClientRoom, Lobby } from "../../shared/shared";
 import { useDispatch, TypedUseSelectorHook, useSelector } from "react-redux";
+import { resetTokenOnExpiration } from "./login";
 
 const STATE_VERSION = String(1);
 
@@ -65,6 +66,9 @@ const preloadedState = ((): unknown => {
     rest.user.spotifyToken?.expiresAt < Date.now() + 1000 * 60 * 5;
   if (userTokenIsExpired) {
     rest.user.spotifyToken = undefined;
+  }
+  if (rest.user.spotifyToken) {
+    resetTokenOnExpiration(rest.user.spotifyToken.expiresAt);
   }
   return rest;
 })();

@@ -4,7 +4,7 @@ import { store, useAppSelector, userSlice } from "./store";
 import Room from "./Room";
 import Create from "./Create";
 import { Button, Flex, Heading, TextFieldInput } from "@radix-ui/themes";
-import { getAccessToken } from "./login";
+import { getAccessToken, resetTokenOnExpiration } from "./login";
 
 async function handleOAuthCallback() {
   console.log(window.location.search);
@@ -13,9 +13,10 @@ async function handleOAuthCallback() {
   );
   for (const [key, value] of queryParams) {
     if (key === "code") {
-      getAccessToken(value).then((result) =>
-        store.dispatch(userSlice.actions.setSpotifyToken(result))
-      );
+      getAccessToken(value).then((result) => {
+        store.dispatch(userSlice.actions.setSpotifyToken(result));
+        resetTokenOnExpiration(result.expiresAt);
+      });
     }
   }
 }

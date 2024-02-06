@@ -1,5 +1,6 @@
 import { sha256 } from "js-sha256";
 import env from "./env";
+import { store, userSlice } from "./store";
 
 export async function redirectToAuthCodeFlow() {
   const verifier = generateCodeVerifier(128);
@@ -75,4 +76,10 @@ async function generateCodeChallenge(codeVerifier: string) {
 export function logout() {
   localStorage.clear();
   window.location.reload();
+}
+
+export function resetTokenOnExpiration(exp: number) {
+  setTimeout(() => {
+    store.dispatch(userSlice.actions.setSpotifyToken(undefined));
+  }, exp - Date.now());
 }
