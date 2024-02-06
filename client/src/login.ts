@@ -81,5 +81,5 @@ export function logout() {
 export function resetTokenOnExpiration(exp: number) {
   setTimeout(() => {
     store.dispatch(userSlice.actions.setSpotifyToken(undefined));
-  }, exp - Date.now());
+  }, exp - 30000 - Date.now());
 }
