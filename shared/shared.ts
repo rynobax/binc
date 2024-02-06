@@ -1,4 +1,7 @@
-export const TIME_BETWEEN_ROUNDS_SEC = 5;
+const SPEEDY = true;
+
+export const TIME_BETWEEN_ROUNDS_SEC = SPEEDY ? 1 : 5;
+export const ROUND_LENGTH_SEC = SPEEDY ? 5 : 30;
 
 export interface Env {
   VITE_SERVER_HOST: string;

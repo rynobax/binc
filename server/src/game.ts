@@ -3,13 +3,13 @@ import {
   type GameState,
   type GameScore,
   TIME_BETWEEN_ROUNDS_SEC,
+  ROUND_LENGTH_SEC,
 } from "../../shared/shared";
 import { songs } from "./songs";
 import type { SongInfo } from "./types";
 import { wait } from "./util";
 
 const GAME_LENGTH = 15;
-const ROUND_LENGTH = 30000;
 
 interface GameUser {
   id: string;
@@ -229,7 +229,7 @@ export class Game {
       this.songState = "playing";
       this.roundStartTime = Date.now();
       this.broadcast();
-      await wait(ROUND_LENGTH);
+      await wait(ROUND_LENGTH_SEC * 1000);
       this.previousSongs.unshift(song);
 
       // score round
