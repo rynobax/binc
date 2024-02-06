@@ -1,4 +1,9 @@
-import { shuffle, type GameState, type GameScore } from "../../shared/shared";
+import {
+  shuffle,
+  type GameState,
+  type GameScore,
+  TIME_BETWEEN_ROUNDS_SEC,
+} from "../../shared/shared";
 import { songs } from "./songs";
 import type { SongInfo } from "./types";
 import { wait } from "./util";
@@ -188,7 +193,7 @@ export class Game {
       if (!song) throw new Error("Song not found");
       this.currentSong = song;
       this.broadcast();
-      await wait(5000);
+      await wait(TIME_BETWEEN_ROUNDS_SEC * 1000);
 
       // broadcast next song with playing
       this.songState = "playing";

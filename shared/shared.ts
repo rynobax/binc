@@ -1,3 +1,5 @@
+export const TIME_BETWEEN_ROUNDS_SEC = 5;
+
 export interface Env {
   VITE_SERVER_HOST: string;
   VITE_REDIRECT_URI: string;

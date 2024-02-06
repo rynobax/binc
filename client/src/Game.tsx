@@ -1,7 +1,11 @@
 import React, { useEffect, useRef, useState } from "react";
 import levy from "js-levenshtein";
 import { store, useAppSelector, userSlice } from "./store";
-import { ClientRoom, GameState } from "../../shared/shared";
+import {
+  ClientRoom,
+  GameState,
+  TIME_BETWEEN_ROUNDS_SEC,
+} from "../../shared/shared";
 import { submitCorrectGuess } from "./websocket";
 import { incorrectMessages } from "./data";
 import { Badge, Flex, Slider, Text, TextField } from "@radix-ui/themes";
@@ -25,6 +29,10 @@ function timeSinceGameStart(gameState: GameState, time: number) {
 }
 
 const DEFAULT_VOLUME = 30;
+
+const UPDATE_INTERVAL_MS = 100;
+const PROGRESS_BACKWARDS_UPDATE =
+  100 / ((TIME_BETWEEN_ROUNDS_SEC * 1000) / UPDATE_INTERVAL_MS);
 
 function setVolumeOnEl(newVolume: number, audio: HTMLAudioElement) {
   if (newVolume === 0) {
@@ -86,13 +94,15 @@ const Game: React.FC<GameProps> = ({ room }) => {
     const interval = setInterval(() => {
       const state = store.getState().room.room?.gameState;
       if (!state || state.type === "paused" || state.type === "queued") {
-        setProgress(0);
+        setProgress((prevProg) => {
+          return Math.max(0, prevProg - PROGRESS_BACKWARDS_UPDATE);
+        });
       } else {
         const audioDuration = audioRef.current.duration;
         const audioCurrentTime = audioRef.current.currentTime;
         setProgress((audioCurrentTime / audioDuration) * 100);
       }
-    }, 100);
+    }, UPDATE_INTERVAL_MS);
     return () => clearInterval(interval);
   }, []);
 
