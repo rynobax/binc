@@ -5,4 +5,3 @@ volume wrong at start
 https
 if someone leaves the game will not stop
 first half = more points
-randomly pick songs from each persons playlist

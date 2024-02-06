@@ -30,7 +30,7 @@ const NEW_GUESS = (): Guess => ({
 
 export class Game {
   public users: GameUser[] = [];
-  private songIds: Set<string> = new Set();
+  private songIds: Map<string, Set<string>> = new Map();
   private broadcast: () => void;
   private songState: "queued" | "playing" | "paused" = "paused";
   private currentSong: SongInfo | null = null;
@@ -141,10 +141,12 @@ export class Game {
     this.startIfNeeded();
   }
 
-  public addSongs(songIds: string[]) {
+  public addSongs(playlistId: string, songIds: string[]) {
+    const previousPlaylistSongs = this.songIds.get(playlistId) || new Set();
     for (const songId of songIds) {
-      this.songIds.add(songId);
+      previousPlaylistSongs.add(songId);
     }
+    this.songIds.set(playlistId, previousPlaylistSongs);
   }
 
   private startIfNeeded() {
@@ -181,10 +183,38 @@ export class Game {
     this.broadcast();
   }
 
+  private getSongsForGame() {
+    const songsToUse: string[] = [];
+
+    // shuffle every playlist
+    const shuffledPlaylists: Record<string, string[]> = {};
+    for (const [playlistId, songIds] of this.songIds) {
+      shuffledPlaylists[playlistId] = shuffle(Array.from(songIds));
+    }
+
+    const totalSongs = Object.values(shuffledPlaylists).reduce(
+      (total, songs) => total + songs.length,
+      0
+    );
+    const gameLength = Math.min(GAME_LENGTH, totalSongs);
+
+    const pickOrder = shuffle(Array.from(Object.keys(shuffledPlaylists)));
+    let pickNdx = 0;
+    while (songsToUse.length < gameLength) {
+      const playlistId = pickOrder[pickNdx];
+      const songId = shuffledPlaylists[playlistId].pop();
+      if (songId) {
+        songsToUse.push(songId);
+      }
+      pickNdx = (pickNdx + 1) % pickOrder.length;
+    }
+    return songsToUse;
+  }
+
   private async start() {
     this.previousSongs = [];
     this.resetScores();
-    const songsToUse = shuffle(Array.from(this.songIds)).slice(0, GAME_LENGTH);
+    const songsToUse = this.getSongsForGame();
     console.log("Starting game with songs: ", songsToUse);
     for (const songId of songsToUse) {
       // broad cast next song with queued

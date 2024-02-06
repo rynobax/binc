@@ -104,8 +104,9 @@ async function handleCreateRoom(message: CreateRoomMessage) {
       const tracks = await getPlaylistSongInfo(playlist, message.accessToken);
       for (const track of tracks) {
         songs.set(track.id, track);
-        game.addSongs([track.id]);
       }
+      const trackIds = tracks.map((t) => t.id);
+      game.addSongs(playlist, trackIds);
     }
     room.status = "ready";
     rooms.set(roomId, room);
@@ -166,7 +167,7 @@ function handleGuess(data: GuessMessage, ws: WS) {
     r.game.users.some((u) => u.id === ws.data.userId)
   );
   if (!room) throw new Error("Room not found");
-  room.game.submitUserGuess(ws.data.userId, data.guess);
+  room.game.submitUserGuess(ws.data.userId, data.songId, data.guess);
 }
 
 export function start() {
