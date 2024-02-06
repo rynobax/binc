@@ -1,5 +1,4 @@
 import React, { useEffect, useRef, useState } from "react";
-import levy from "js-levenshtein";
 import { store, useAppSelector, userSlice } from "./store";
 import {
   ClientRoom,
@@ -11,13 +10,7 @@ import { incorrectMessages } from "./data";
 import { Badge, Flex, Slider, Text, TextField } from "@radix-ui/themes";
 import { remapToLogScale } from "./util";
 import PreviousSongs from "./PreviousSongs";
-
-function doStringsMatch(target: string, guess: string) {
-  if (target.length < 4)
-    return target.toLocaleLowerCase() === guess.toLocaleLowerCase();
-  const distance = levy(target.toLocaleLowerCase(), guess.toLocaleLowerCase());
-  return distance <= 3;
-}
+import { isGuessCorrect } from "./guess";
 
 function timeSinceGameStart(gameState: GameState, time: number) {
   if (gameState.type === "paused") return "";
@@ -111,12 +104,12 @@ const Game: React.FC<GameProps> = ({ room }) => {
     const { currentSong } = room.gameState;
     if (!currentSong) return;
     let correct = false;
-    if (doStringsMatch(currentSong.title, attemptedGuess)) {
+    if (isGuessCorrect(currentSong.title, attemptedGuess)) {
       correct = true;
       submitCorrectGuess(currentSong.id, "title");
     }
     for (const artist of currentSong.artistNames) {
-      if (doStringsMatch(artist, attemptedGuess)) {
+      if (isGuessCorrect(artist, attemptedGuess)) {
         correct = true;
         submitCorrectGuess(currentSong.id, "artist");
         break;
