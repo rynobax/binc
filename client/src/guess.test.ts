@@ -1,0 +1,47 @@
+import { isGuessCorrect } from "./guess";
+
+it.each<[string, string, boolean]>([
+  ["A", "a", true],
+  ["a", "A", true],
+  ["a", "a", true],
+  ["a", "b", false],
+  ["aa", "aa", true],
+  ["aa", "ab", false],
+  ["aaa", "aaa", true],
+  ["aaa", "aab", false],
+  ["aaaa", "aaaa", true],
+  ["aaaa", "aaab", false],
+  ["x.o.", "xo", true],
+  ["xo", "x.o.", true],
+  ["p.i.m.p.", "pimp", true],
+  ["pimp", "p.i.m.p.", true],
+  ["song (taylors version)", "song (taylors version)", true],
+  ["song (taylors version)", "song", true],
+  ["song - taylors version", "song - taylors version)", true],
+  ["song - taylors version", "song", true],
+  ["the song", "the song", true],
+  ["the song", "song", true],
+  ["song", "the song", true],
+  ["song - taylors version", "the song", true],
+  [
+    "Champagne For My Real Friends, Real Pain For My Sham Friends",
+    "Champaign for my friend, pain for my sham friends",
+    true,
+  ],
+  [
+    "Champagne For My Real Friends, Real Pain For My Sham Friends",
+    "this is something completely different lol friend sham pain",
+    false,
+  ],
+  ["Tiffany Blews", "Tiffany Blows", true],
+  ["Tiffany Blews", "Tiffany Snows", true],
+  ["Tiffany Blews", "Tiffany Is not cool", false],
+  ["Tiffany Blews", "I blew my nose", false],
+  ["7 Minutes in Heaven", "Seven Minutes in Heaven", true],
+  ["Seven Minutes in Heaven", "7 Minutes in Heaven", true],
+  ["21 pilots", "twenty one pilots", true],
+  ["twenty one pilots", "21 pilots", true],
+  ["son of nyx", "onson fyx", false],
+])("%s -> %s | %s", (target, guess, expected) => {
+  expect(isGuessCorrect(target, guess)).toBe(expected);
+});

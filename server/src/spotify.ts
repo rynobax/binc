@@ -85,12 +85,6 @@ async function getAllPlaylistTracks(playlistId: string, clientToken: string) {
   return tracks;
 }
 
-function cleanSongName(name: string) {
-  const withoutParen = name.split(" (")[0];
-  const withoutDash = withoutParen.split(" - ")[0];
-  return withoutDash;
-}
-
 export async function getPlaylistSongInfo(
   playlistId: string,
   clientToken: string
@@ -112,7 +106,7 @@ export async function getPlaylistSongInfo(
       .slice(20)
       .map((track) => ({
         id: track.id,
-        title: cleanSongName(track.name),
+        title: track.name,
         artists: track.artists.map((a) => a.name),
         albumCover: track.album.name,
         previewUrl: track.preview_url,
