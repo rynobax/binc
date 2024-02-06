@@ -198,7 +198,7 @@ export class Game {
     );
     const gameLength = Math.min(GAME_LENGTH, totalSongs);
 
-    const pickOrder = shuffle(Array.from(Object.keys(shuffledPlaylists)));
+    const pickOrder = shuffle(Object.keys(shuffledPlaylists));
     let pickNdx = 0;
     while (songsToUse.length < gameLength) {
       const playlistId = pickOrder[pickNdx];
@@ -208,7 +208,7 @@ export class Game {
       }
       pickNdx = (pickNdx + 1) % pickOrder.length;
     }
-    return songsToUse;
+    return shuffle(songsToUse);
   }
 
   private async start() {
