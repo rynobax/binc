@@ -1,6 +1,6 @@
 const SPEEDY = false;
 
-export const TIME_BETWEEN_ROUNDS_SEC = SPEEDY ? 1 : 5;
+export const TIME_BETWEEN_ROUNDS_SEC = SPEEDY ? 1 : 3;
 export const ROUND_LENGTH_SEC = SPEEDY ? 5 : 30;
 
 export interface Env {
