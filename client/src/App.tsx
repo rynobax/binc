@@ -42,6 +42,7 @@ function App() {
       <Flex gap="5">
         <TextFieldInput
           value={username}
+          maxLength={40}
           onChange={(e) =>
             store.dispatch(userSlice.actions.setName(e.target.value))
           }
