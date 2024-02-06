@@ -35,6 +35,7 @@ export class Game {
   private songState: "queued" | "playing" | "paused" = "paused";
   private currentSong: SongInfo | null = null;
   private previousSongs: SongInfo[] = [];
+  private usedSongs: Set<string> = new Set();
   private guesses = new Map<string, Guess>();
   private roundStartTime = 0;
 
@@ -86,6 +87,7 @@ export class Game {
       albumArt: s.albumCover,
       title: s.title,
       promotionalLink: s.promotionalLink,
+      id: s.id,
     }));
     if (this.songState === "paused") {
       const previousGameScores = this.getScores();
@@ -202,11 +204,22 @@ export class Game {
     let pickNdx = 0;
     while (songsToUse.length < gameLength) {
       const playlistId = pickOrder[pickNdx];
-      const songId = shuffledPlaylists[playlistId].pop();
+      const pickedPlaylist = shuffledPlaylists[playlistId];
+
+      let songId = pickedPlaylist.pop();
+      while (songId && this.usedSongs.has(songId)) {
+        songId = pickedPlaylist.pop();
+      }
+
       if (songId) {
         songsToUse.push(songId);
+        this.usedSongs.add(songId);
       }
+
       pickNdx = (pickNdx + 1) % pickOrder.length;
+      if (this.usedSongs.size === totalSongs) {
+        this.usedSongs.clear();
+      }
     }
     return shuffle(songsToUse);
   }

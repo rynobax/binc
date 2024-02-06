@@ -14,6 +14,7 @@ const Lobby: React.FC = () => {
           <Button
             color="violet"
             variant="soft"
+            disabled={room.status !== "creating"}
             onClick={() => joinRoom(room.id, name)}
             key={room.id}
           >
