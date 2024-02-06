@@ -11,6 +11,6 @@
   "dependencies": {},
   "scripts": {
     "dev": "bun index.ts",
-    "prod": "bun --watch index.ts"
+    "prod": "bun index.ts"
   }
 }
