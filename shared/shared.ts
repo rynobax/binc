@@ -20,33 +20,38 @@ export interface Lobby {
   rooms: LobbyRoom[];
 }
 
-export type GameState =
-  | {
-      type: "paused";
-      previousGameScores: { name: string; score: number }[] | null;
-    }
-  | {
-      type: "queued" | "playing";
-      songUrl: string;
-      songTitle: string;
-      artistNames: string[];
-      previousSongs: {
-        title: string;
-        artistNames: string[];
-        albumArt: string;
-        promotionalLink: string;
-      }[];
-      scores: {
-        name: string;
-        score: number;
-        guesses: {
-          title: boolean;
-          artist: boolean;
-        };
-      }[];
-      currentRound: number;
-      totalRounds: number;
-    };
+export interface GameScore {
+  name: string;
+  score: number;
+  guesses: {
+    title: number;
+    artist: number;
+  };
+}
+
+export interface PausedGameState {
+  type: "paused";
+  previousGameScores: { name: string; score: number }[] | null;
+}
+
+export interface RunningGameState {
+  type: "queued" | "playing";
+  songUrl: string;
+  songTitle: string;
+  artistNames: string[];
+  previousSongs: {
+    title: string;
+    artistNames: string[];
+    albumArt: string;
+    promotionalLink: string;
+  }[];
+  scores: GameScore[];
+  roundStartTime: number;
+  currentRound: number;
+  totalRounds: number;
+}
+
+export type GameState = PausedGameState | RunningGameState;
 
 export interface ClientRoom {
   id: string;

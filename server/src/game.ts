@@ -1,4 +1,4 @@
-import { shuffle, type GameState } from "../../shared/shared";
+import { shuffle, type GameState, type GameScore } from "../../shared/shared";
 import { songs } from "./songs";
 import type { SongInfo } from "./types";
 import { wait } from "./util";
@@ -14,10 +14,14 @@ interface GameUser {
 }
 
 interface Guess {
-  title: boolean;
-  artist: boolean;
-  time: number;
+  title: number;
+  artist: number;
 }
+
+const NEW_GUESS = (): Guess => ({
+  title: 0,
+  artist: 0,
+});
 
 export class Game {
   public users: GameUser[] = [];
@@ -27,6 +31,7 @@ export class Game {
   private currentSong: SongInfo | null = null;
   private previousSongs: SongInfo[] = [];
   private guesses = new Map<string, Guess>();
+  private roundStartTime = 0;
 
   constructor(broadcast: () => void) {
     this.broadcast = broadcast;
@@ -36,7 +41,8 @@ export class Game {
     return this.users.reduce((total, user) => {
       const guess = this.guesses.get(user.id);
       if (!guess) return total;
-      if (guess.title && guess.artist && guess.time < guessTime)
+      const lastGuessTime = Math.max(guess.title, guess.artist);
+      if (guess.title && guess.artist && lastGuessTime < guessTime)
         return total + 1;
       return total;
     }, 0);
@@ -46,21 +52,25 @@ export class Game {
     const guess = this.guesses.get(userId);
     if (!guess) return 0;
     if (guess.title && guess.artist) {
-      const bonus = Math.max(0, 3 - this.numPeopleWhoGuessedBefore(guess.time));
+      const penalty = this.numPeopleWhoGuessedBefore(
+        Math.max(guess.title, guess.artist)
+      );
+      const bonus = Math.max(0, 3 - penalty);
       return 3 + bonus;
     }
     if (guess.title || guess.artist) return 1;
     return 0;
   }
 
-  private getScores() {
+  private getScores(): GameScore[] {
     return this.users
       .sort((a, b) => b.score - a.score)
-      .map((u) => {
+      .map<GameScore>((u) => {
+        const guess = this.guesses.get(u.id) || NEW_GUESS();
         return {
           name: u.name,
           score: u.score + this.getUserRoundScore(u.id),
-          guesses: this.guesses.get(u.id) || { title: false, artist: false },
+          guesses: guess,
         };
       });
   }
@@ -91,6 +101,7 @@ export class Game {
       })),
       scores: this.getScores(),
       songUrl: this.currentSong.previewUrl,
+      roundStartTime: this.roundStartTime,
       totalRounds: GAME_LENGTH,
       currentRound: this.previousSongs.length + 1,
     };
@@ -149,13 +160,8 @@ export class Game {
   }
 
   public submitUserGuess(userId: string, guess: "title" | "artist") {
-    const newGuess: Guess = this.guesses.get(userId) || {
-      title: false,
-      artist: false,
-      time: Date.now(),
-    };
-    newGuess[guess] = true;
-    newGuess.time = Date.now();
+    const newGuess: Guess = this.guesses.get(userId) || NEW_GUESS();
+    newGuess[guess] = Date.now();
     this.guesses.set(userId, newGuess);
     this.broadcast();
   }
@@ -175,6 +181,7 @@ export class Game {
 
       // broadcast next song with playing
       this.songState = "playing";
+      this.roundStartTime = Date.now();
       this.broadcast();
       await wait(ROUND_LENGTH);
       this.previousSongs.unshift(song);

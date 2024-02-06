@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import levy from "js-levenshtein";
 import { store, useAppSelector, userSlice } from "./store";
-import { ClientRoom } from "../../shared/shared";
+import { ClientRoom, GameState } from "../../shared/shared";
 import { submitCorrectGuess } from "./websocket";
 import { incorrectMessages } from "./data";
 import {
@@ -20,6 +20,15 @@ function doStringsMatch(target: string, guess: string) {
     return target.toLocaleLowerCase() === guess.toLocaleLowerCase();
   const distance = levy(target.toLocaleLowerCase(), guess.toLocaleLowerCase());
   return distance <= 3;
+}
+
+function timeSinceGameStart(gameState: GameState, time: number) {
+  if (gameState.type === "paused") return "";
+  if (time === 0) return "";
+  const { roundStartTime } = gameState;
+  const seconds = (time - roundStartTime) / 1000;
+  const secondsStr = seconds.toFixed(1);
+  return ` (${secondsStr}s)`;
 }
 
 const DEFAULT_VOLUME = 30;
@@ -88,7 +97,7 @@ const Game: React.FC<GameProps> = ({ room }) => {
         const audioCurrentTime = audioRef.current.currentTime;
         setProgress((audioCurrentTime / audioDuration) * 100);
       }
-    }, 200);
+    }, 100);
     return () => clearInterval(interval);
   }, []);
 
@@ -131,27 +140,34 @@ const Game: React.FC<GameProps> = ({ room }) => {
                 Round {room.gameState.currentRound} of{" "}
                 {room.gameState.totalRounds}
               </Text>
-              {room.gameState.scores.map((user) => (
-                <div key={user.name}>
-                  <Flex gap="2" style={{ minHeight: 0 }}>
-                    <Badge
-                      color={user.guesses.title ? "green" : "gray"}
-                      variant={user.guesses.title ? "solid" : "soft"}
-                    >
-                      song
-                    </Badge>
-                    <Badge
-                      color={user.guesses.artist ? "green" : "gray"}
-                      variant={user.guesses.artist ? "solid" : "soft"}
-                    >
-                      artist
-                    </Badge>
-                    <Text>
-                      {user.name} ({user.score})
-                    </Text>
-                  </Flex>
-                </div>
-              ))}
+              {room.gameState.scores.map((user) => {
+                return (
+                  <div key={user.name}>
+                    <Flex gap="2" style={{ minHeight: 0 }}>
+                      <Badge
+                        color={user.guesses.title ? "green" : "gray"}
+                        variant={user.guesses.title ? "solid" : "soft"}
+                      >
+                        song
+                        {timeSinceGameStart(room.gameState, user.guesses.title)}
+                      </Badge>
+                      <Badge
+                        color={user.guesses.artist ? "green" : "gray"}
+                        variant={user.guesses.artist ? "solid" : "soft"}
+                      >
+                        artist
+                        {timeSinceGameStart(
+                          room.gameState,
+                          user.guesses.artist
+                        )}
+                      </Badge>
+                      <Text>
+                        {user.name} ({user.score})
+                      </Text>
+                    </Flex>
+                  </div>
+                );
+              })}
             </Flex>
             <Flex direction="column" gap="2">
               <Text size="2" weight="bold">
