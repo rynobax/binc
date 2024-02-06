@@ -147,7 +147,7 @@ const Game: React.FC<GameProps> = ({ room }) => {
                       <Badge
                         color={user.guesses.title ? "green" : "gray"}
                         variant={user.guesses.title ? "solid" : "soft"}
-                        style={{ minWidth: 88 }}
+                        style={{ minWidth: 88, textAlign: "center" }}
                       >
                         song
                         {timeSinceGameStart(room.gameState, user.guesses.title)}
@@ -155,7 +155,7 @@ const Game: React.FC<GameProps> = ({ room }) => {
                       <Badge
                         color={user.guesses.artist ? "green" : "gray"}
                         variant={user.guesses.artist ? "solid" : "soft"}
-                        style={{ minWidth: 88 }}
+                        style={{ minWidth: 88, textAlign: "center" }}
                       >
                         artist
                         {timeSinceGameStart(
