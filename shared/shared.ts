@@ -29,9 +29,17 @@ export interface GameScore {
   };
 }
 
+interface PreviousSong {
+  title: string;
+  artistNames: string[];
+  albumArt: string;
+  promotionalLink: string;
+}
+
 export interface PausedGameState {
   type: "paused";
   previousGameScores: { name: string; score: number }[] | null;
+  previousSongs: PreviousSong[];
 }
 
 export interface RunningGameState {
@@ -39,12 +47,7 @@ export interface RunningGameState {
   songUrl: string;
   songTitle: string;
   artistNames: string[];
-  previousSongs: {
-    title: string;
-    artistNames: string[];
-    albumArt: string;
-    promotionalLink: string;
-  }[];
+  previousSongs: PreviousSong[];
   scores: GameScore[];
   roundStartTime: number;
   currentRound: number;

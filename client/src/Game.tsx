@@ -4,16 +4,9 @@ import { store, useAppSelector, userSlice } from "./store";
 import { ClientRoom, GameState } from "../../shared/shared";
 import { submitCorrectGuess } from "./websocket";
 import { incorrectMessages } from "./data";
-import {
-  Badge,
-  Flex,
-  Link,
-  ScrollArea,
-  Slider,
-  Text,
-  TextField,
-} from "@radix-ui/themes";
+import { Badge, Flex, Slider, Text, TextField } from "@radix-ui/themes";
 import { remapToLogScale } from "./util";
+import PreviousSongs from "./PreviousSongs";
 
 function doStringsMatch(target: string, guess: string) {
   if (target.length < 4)
@@ -169,32 +162,9 @@ const Game: React.FC<GameProps> = ({ room }) => {
                 );
               })}
             </Flex>
-            <Flex direction="column" gap="2">
-              <Text size="2" weight="bold">
-                Previous songs
-              </Text>
-              <ScrollArea
-                size="1"
-                type="hover"
-                scrollbars="vertical"
-                style={{ maxHeight: 200 }}
-              >
-                <Flex direction="column" gap="3">
-                  {room.gameState.previousSongs.map((song) => (
-                    <Flex direction="column" gap="0">
-                      <Text size="2">
-                        <Link href={song.promotionalLink} target="_blank">
-                          {song.title}
-                        </Link>
-                      </Text>
-                      <Text size="1" weight="medium">
-                        {song.artistNames.join(", ")}
-                      </Text>
-                    </Flex>
-                  ))}
-                </Flex>
-              </ScrollArea>
-            </Flex>
+            {room.gameState.previousSongs.length > 0 && (
+              <PreviousSongs previousSongs={room.gameState.previousSongs} />
+            )}
           </>
         )}
       </Flex>

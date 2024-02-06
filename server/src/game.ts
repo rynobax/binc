@@ -76,6 +76,12 @@ export class Game {
   }
 
   public getState(): GameState {
+    const previousSongs = this.previousSongs.map((s) => ({
+      artistNames: s.artists,
+      albumArt: s.albumCover,
+      title: s.title,
+      promotionalLink: s.promotionalLink,
+    }));
     if (this.songState === "paused") {
       const previousGameScores = this.getScores();
       const previousGameScoresAreAllZero = previousGameScores.every(
@@ -86,6 +92,7 @@ export class Game {
         previousGameScores: previousGameScoresAreAllZero
           ? null
           : this.getScores(),
+        previousSongs,
       };
     }
     if (!this.currentSong) throw new Error("No current song");
@@ -93,12 +100,7 @@ export class Game {
       type: this.songState,
       artistNames: this.currentSong.artists,
       songTitle: this.currentSong.title,
-      previousSongs: this.previousSongs.map((s) => ({
-        artistNames: s.artists,
-        albumArt: s.albumCover,
-        title: s.title,
-        promotionalLink: s.promotionalLink,
-      })),
+      previousSongs,
       scores: this.getScores(),
       songUrl: this.currentSong.previewUrl,
       roundStartTime: this.roundStartTime,
@@ -151,7 +153,6 @@ export class Game {
 
   private resetGame() {
     this.songState = "paused";
-    this.previousSongs = [];
     this.currentSong = null;
   }
 
@@ -167,6 +168,7 @@ export class Game {
   }
 
   private async start() {
+    this.previousSongs = [];
     this.resetScores();
     const songsToUse = shuffle(Array.from(this.songIds)).slice(0, GAME_LENGTH);
     console.log("Starting game with songs: ", songsToUse);

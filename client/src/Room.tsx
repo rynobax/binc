@@ -3,6 +3,7 @@ import { useAppSelector } from "./store";
 import { leaveRoom, readyUp } from "./websocket";
 import Game from "./Game";
 import { Badge, Button, Flex, Heading, Text } from "@radix-ui/themes";
+import PreviousSongs from "./PreviousSongs";
 
 const Room: React.FC = () => {
   const room = useAppSelector((state) => state.room.room);
@@ -45,6 +46,7 @@ const Room: React.FC = () => {
                 ))}
               </Flex>
             )}
+            <PreviousSongs previousSongs={room.gameState.previousSongs} />
           </Flex>
         )}
       </Flex>
