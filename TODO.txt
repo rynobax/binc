@@ -18,6 +18,7 @@ chat room
 refresh my client oauth token
 double click replace
 skip if everyone gets it
+hangman mode
 
 more testing on songs
 
