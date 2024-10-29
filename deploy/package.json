@@ -1,8 +1,4 @@
 {
-  "name": "deploy",
-  "version": "1.0.0",
-  "main": "index.js",
-  "license": "MIT",
   "dependencies": {
     "pm2": "^5.3.1"
   },
