@@ -82,7 +82,7 @@ async function getAllPlaylistTracks(playlistId: string, clientToken: string) {
     tracks.push(...response.items.map((i) => i.track));
     offset += response.items.length;
   } while (response.next);
-  return tracks;
+  return tracks.filter(Boolean);
 }
 
 export async function getPlaylistSongInfo(
