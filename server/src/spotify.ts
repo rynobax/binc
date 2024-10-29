@@ -65,7 +65,7 @@ const getPlaylistTracks = (
   offset: number,
   clientToken: string
 ) =>
-  querySpotify<GetPlaylistTracksResponse>(
+  querySpotify<GetPlaylistTracksResponse | undefined>(
     `playlists/${playlistId}/tracks?offset=${offset}&limit=50`,
     clientToken
   );
@@ -76,12 +76,14 @@ const getTrackById = (trackId: string, clientToken: string) =>
 async function getAllPlaylistTracks(playlistId: string, clientToken: string) {
   const tracks: SpotifyTrack[] = [];
   let offset = 0;
-  let response: GetPlaylistTracksResponse;
+  let response: GetPlaylistTracksResponse | undefined;
   do {
     response = await getPlaylistTracks(playlistId, offset, clientToken);
-    tracks.push(...response.items.map((i) => i.track));
-    offset += response.items.length;
-  } while (response.next);
+    if (response) {
+      tracks.push(...response.items.map((i) => i.track));
+      offset += response.items.length;
+    }
+  } while (response && response.next);
   return tracks.filter(Boolean);
 }
 
