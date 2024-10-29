@@ -16,6 +16,8 @@ cheat code
 remove text on round start not working
 chat room
 refresh my client oauth token
+double click replace
+skip if everyone gets it
 
 more testing on songs
 
