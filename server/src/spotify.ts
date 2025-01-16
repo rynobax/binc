@@ -79,7 +79,6 @@ async function getAllPlaylistTracks(playlistId: string, clientToken: string) {
   let response: GetPlaylistTracksResponse | undefined;
   do {
     response = await getPlaylistTracks(playlistId, offset, clientToken);
-    console.log(response?.items?.map((i) => i.track));
     if (response) {
       tracks.push(...response.items.map((i) => i.track));
       offset += response.items.length;
@@ -92,7 +91,16 @@ export async function getPlaylistSongInfo(
   playlistId: string,
   clientToken: string
 ): Promise<SongInfo[]> {
-  const tracks = await getAllPlaylistTracks(playlistId, clientToken);
+  const tracksWithoutPreviewUrls = await getAllPlaylistTracks(
+    playlistId,
+    clientToken
+  );
+  const tracks: SpotifyTrack[] = [];
+  for (const track of tracksWithoutPreviewUrls) {
+    const trackWithPreviewUrl = await getTrackById(track.id, clientToken);
+    console.log(trackWithPreviewUrl);
+    tracks.push(trackWithPreviewUrl);
+  }
   const playableTracks = tracks.filter((track) => track.preview_url);
   const numPlayableTracks = playableTracks.length;
   const numTracks = tracks.length;
