@@ -55,8 +55,9 @@ const connect = (function () {
 
 export async function startRoom(name: string, playlistIds: string[]) {
   const socket = await connect;
-  const accessToken = store.getState().user.spotifyToken?.token;
-  if (!accessToken) throw new Error("No access token found");
+  const accessToken = "youtube";
+  // const accessToken = store.getState().user.spotifyToken?.token;
+  // if (!accessToken) throw new Error("No access token found");
   socket.send({
     name,
     playlistIds,

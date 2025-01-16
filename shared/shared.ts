@@ -39,7 +39,7 @@ interface PreviousSong {
   title: string;
   artistNames: string[];
   albumArt: string;
-  promotionalLink: string;
+  link: string;
 }
 
 export interface PausedGameState {

@@ -60,14 +60,18 @@ interface DefaultPlaylist {
   id: string;
 }
 
+// export const defaultPlaylists: DefaultPlaylist[] = [
+//   { name: "Top 50 - USA", id: "37i9dQZEVXbLRQDuF5jeBp" },
+//   { name: "RapCaviar", id: "37i9dQZF1DX0XUsuxWHRQd" },
+//   { name: "Today's Top Hits", id: "37i9dQZF1DXcBWIGoYBM5M" },
+//   { name: "Billboard Hot 100", id: "6UeSakyzhiEt4NB3UAd6NQ" },
+//   { name: "Billboard #1s 2000 - Today", id: "5sUksHiPlavLs0dnDqvFgJ" },
+//   { name: "Every Billboard #1", id: "6eXlxttw7urdPUDEavpT17" },
+//   { name: "Classic Rock", id: "4cVibuAVfrfiwwZaHGpBzd" },
+//   { name: "All Time Rap Hits", id: "7GjUYpEYbpQ6lMiGxLVCJQ" },
+//   { name: "Billions Club", id: "37i9dQZF1DX7iB3RCnBnN4" },
+// ].sort((a, b) => a.name.localeCompare(b.name));
+
 export const defaultPlaylists: DefaultPlaylist[] = [
-  { name: "Top 50 - USA", id: "37i9dQZEVXbLRQDuF5jeBp" },
-  { name: "RapCaviar", id: "37i9dQZF1DX0XUsuxWHRQd" },
-  { name: "Today's Top Hits", id: "37i9dQZF1DXcBWIGoYBM5M" },
-  { name: "Billboard Hot 100", id: "6UeSakyzhiEt4NB3UAd6NQ" },
-  { name: "Billboard #1s 2000 - Today", id: "5sUksHiPlavLs0dnDqvFgJ" },
-  { name: "Every Billboard #1", id: "6eXlxttw7urdPUDEavpT17" },
-  { name: "Classic Rock", id: "4cVibuAVfrfiwwZaHGpBzd" },
-  { name: "All Time Rap Hits", id: "7GjUYpEYbpQ6lMiGxLVCJQ" },
-  { name: "Billions Club", id: "37i9dQZF1DX7iB3RCnBnN4" },
+  { name: "Billions Club", id: "PLp9W7ZPq-cDaFITBBaqFIQxv_CcM--42g" },
 ].sort((a, b) => a.name.localeCompare(b.name));

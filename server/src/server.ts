@@ -8,11 +8,11 @@ import {
   type ClientRoom,
   type GuessMessage,
 } from "../../shared/shared";
-import { getPlaylistSongInfo } from "./spotify";
 import { Game } from "./game";
 import { songs } from "./songs";
 import { publish, sendWSMessage, startServer, type WS } from "./websocket";
 import { generateId } from "./util";
+import { getPlaylistSongs } from "./youtube";
 
 interface ServerRoom {
   id: string;
@@ -100,13 +100,13 @@ async function handleCreateRoom(message: CreateRoomMessage) {
     // Notify of new room
     globalUpdateLobby();
 
-    for (const playlist of message.playlistIds) {
-      const tracks = await getPlaylistSongInfo(playlist, message.accessToken);
+    for (const playlistId of message.playlistIds) {
+      const tracks = await getPlaylistSongs(playlistId);
       for (const track of tracks) {
         songs.set(track.id, track);
       }
       const trackIds = tracks.map((t) => t.id);
-      game.addSongs(playlist, trackIds);
+      game.addSongs(playlistId, trackIds);
     }
     room.status = "ready";
     rooms.set(roomId, room);

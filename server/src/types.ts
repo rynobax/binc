@@ -188,6 +188,7 @@ export interface SongInfo {
   title: string;
   artists: string[];
   albumCover: string;
+  youtubeUrl: string;
   previewUrl: string;
-  promotionalLink: string;
+  link: string;
 }

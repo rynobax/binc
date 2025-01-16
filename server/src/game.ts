@@ -86,7 +86,7 @@ export class Game {
       artistNames: s.artists,
       albumArt: s.albumCover,
       title: s.title,
-      promotionalLink: s.promotionalLink,
+      link: s.link,
       id: s.id,
     }));
     if (this.songState === "paused") {
@@ -107,7 +107,7 @@ export class Game {
       currentSong: this.currentSong
         ? {
             id: this.currentSong.id,
-            url: this.currentSong.previewUrl,
+            url: this.currentSong.youtubeUrl,
             title: this.currentSong.title,
             artistNames: this.currentSong.artists,
           }

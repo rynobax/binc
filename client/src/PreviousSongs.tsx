@@ -22,7 +22,7 @@ const PreviousSongs: React.FC<PreviousSongsProps> = ({ previousSongs }) => {
           {previousSongs.map((song) => (
             <Flex direction="column" gap="0" key={song.id}>
               <Text size="2">
-                <Link href={song.promotionalLink} target="_blank">
+                <Link href={song.link} target="_blank">
                   {song.title}
                 </Link>
               </Text>

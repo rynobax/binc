@@ -1,16 +1,17 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { store, useAppSelector, userSlice } from "./store";
 import {
   ClientRoom,
   GameState,
+  ROUND_LENGTH_SEC,
   TIME_BETWEEN_ROUNDS_SEC,
 } from "../../shared/shared";
 import { submitCorrectGuess } from "./websocket";
 import { incorrectMessages } from "./data";
 import { Badge, Flex, Slider, Text, TextField } from "@radix-ui/themes";
-import { remapToLogScale } from "./util";
 import PreviousSongs from "./PreviousSongs";
 import { isGuessCorrect } from "./guess";
+import { YTPlayer } from "./ytPlayer";
 
 function timeSinceGameStart(gameState: GameState, time: number) {
   if (gameState.type === "paused") return "";
@@ -21,27 +22,13 @@ function timeSinceGameStart(gameState: GameState, time: number) {
   return ` (${secondsStr}s)`;
 }
 
+// TODO: not great
+const VIDEO_START_SEC = 30;
 const DEFAULT_VOLUME = 30;
 
 const UPDATE_INTERVAL_MS = 100;
 const PROGRESS_BACKWARDS_UPDATE =
   100 / ((TIME_BETWEEN_ROUNDS_SEC * 1000) / UPDATE_INTERVAL_MS);
-
-function setVolumeOnEl(newVolume: number, audio: HTMLAudioElement) {
-  if (newVolume === 0) {
-    audio.volume = 0;
-    return;
-  }
-  const logVolume = remapToLogScale(newVolume);
-  audio.volume = logVolume / 100;
-}
-
-function createAudioElement() {
-  const el = document.createElement("audio");
-  el.preload = "auto";
-  setVolumeOnEl(DEFAULT_VOLUME, el);
-  return el;
-}
 
 interface GameProps {
   room: ClientRoom;
@@ -54,14 +41,10 @@ const Game: React.FC<GameProps> = ({ room }) => {
   const [guessResponse, setGuessResponse] = useState("");
   const [incorrectGuessNdx, setIncorrectGuessNdx] = useState(0);
   const [guess, setGuess] = useState("");
-  const audioRef = useRef(createAudioElement());
 
   useEffect(function destroyOnUnmount() {
-    const audioEl = audioRef.current;
     return () => {
-      audioEl.pause();
-      audioEl.src = "";
-      audioEl.remove();
+      YTPlayer().pauseVideo();
     };
   }, []);
 
@@ -72,15 +55,29 @@ const Game: React.FC<GameProps> = ({ room }) => {
   }, [room.gameState.type]);
 
   useEffect(() => {
-    if (room.gameState.type === "paused") return;
-    const currentSongUrl = room.gameState.currentSong?.url;
-    if (!currentSongUrl) return;
-    if (audioRef.current.src !== currentSongUrl) {
-      audioRef.current.src = currentSongUrl;
-      audioRef.current.load();
+    console.log(room.gameState.type);
+    if (room.gameState.type === "paused") {
+      YTPlayer().pauseVideo();
+      return;
     }
-    if (room.gameState.type === "playing") audioRef.current.play();
-    else audioRef.current.pause();
+
+    // TODO: cue
+    if (room.gameState.type === "queued") {
+      YTPlayer().pauseVideo();
+      return;
+    }
+
+    const currentSongId = room.gameState.currentSong?.id;
+    async function doStuff() {
+      if (!currentSongId) return;
+      const url = "";
+      console.log({ currentSongId, url });
+      if (currentSongId && YTPlayer().currentVideoId() !== currentSongId) {
+        YTPlayer().loadVideoById(currentSongId, VIDEO_START_SEC);
+      }
+    }
+
+    doStuff().catch(console.error);
   }, [room.gameState]);
 
   useEffect(() => {
@@ -91,8 +88,9 @@ const Game: React.FC<GameProps> = ({ room }) => {
           return Math.max(0, prevProg - PROGRESS_BACKWARDS_UPDATE);
         });
       } else {
-        const audioDuration = audioRef.current.duration;
-        const audioCurrentTime = audioRef.current.currentTime;
+        const audioDuration = ROUND_LENGTH_SEC;
+        const audioCurrentTime = YTPlayer().currentTime() - VIDEO_START_SEC;
+        console.log({ audioDuration, audioCurrentTime });
         setProgress((audioCurrentTime / audioDuration) * 100);
       }
     }, UPDATE_INTERVAL_MS);
@@ -127,7 +125,7 @@ const Game: React.FC<GameProps> = ({ room }) => {
 
   function changeVolume(newVolume: number) {
     setVolume(newVolume);
-    setVolumeOnEl(newVolume, audioRef.current);
+    YTPlayer().setVolume(newVolume);
   }
 
   return (

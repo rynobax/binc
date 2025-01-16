@@ -12,3 +12,15 @@ export function remapToLogScale(value: number): number {
 
   return result;
 }
+
+export function parsePlaylistId(url: string): string | null {
+  const urlObj = new URL(url);
+  const urlParams = new URLSearchParams(urlObj.search);
+  const playlistId = urlParams.get("list");
+
+  if (!playlistId) {
+    return null;
+  }
+
+  return playlistId;
+}

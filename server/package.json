@@ -8,7 +8,9 @@
   "peerDependencies": {
     "typescript": "^5.0.0"
   },
-  "dependencies": {},
+  "dependencies": {
+    "googleapis": "^144.0.0"
+  },
   "scripts": {
     "dev": "bun index.ts",
     "prod": "bun index.ts"
