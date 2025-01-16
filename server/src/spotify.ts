@@ -79,6 +79,7 @@ async function getAllPlaylistTracks(playlistId: string, clientToken: string) {
   let response: GetPlaylistTracksResponse | undefined;
   do {
     response = await getPlaylistTracks(playlistId, offset, clientToken);
+    console.log(response);
     if (response) {
       tracks.push(...response.items.map((i) => i.track));
       offset += response.items.length;
