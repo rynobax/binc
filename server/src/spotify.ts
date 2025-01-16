@@ -93,15 +93,12 @@ export async function getPlaylistSongInfo(
 ): Promise<SongInfo[]> {
   const tracks = await getAllPlaylistTracks(playlistId, clientToken);
   const playableTracks = tracks.filter((track) => track.preview_url);
-  const unplayableTracks = tracks.filter((track) => !track.preview_url);
   const numPlayableTracks = playableTracks.length;
   const numTracks = tracks.length;
   const pctPlayable = (numPlayableTracks / numTracks) * 100;
-  if (unplayableTracks.length > 0) {
-    console.log(
-      `${pctPlayable}% of tracks are playable (${numPlayableTracks}/${numTracks})`
-    );
-  }
+  console.log(
+    `${pctPlayable}% of tracks are playable (${numPlayableTracks}/${numTracks})`
+  );
   return (
     shuffle(playableTracks)
       // TODO: REMOVE THIS
