@@ -50,7 +50,6 @@ async function handleResponse(response: Response) {
 
 async function querySpotify<T>(query: string, clientToken: string) {
   const URL = `https://api.spotify.com/v1/${query}`;
-  console.log(clientToken);
   const response = await fetch(URL, {
     headers: {
       // Authorization: `Bearer ${await token}`,
@@ -98,7 +97,6 @@ export async function getPlaylistSongInfo(
   const tracks: SpotifyTrack[] = [];
   for (const track of tracksWithoutPreviewUrls) {
     const trackWithPreviewUrl = await getTrackById(track.id, clientToken);
-    console.log(trackWithPreviewUrl);
     tracks.push(trackWithPreviewUrl);
   }
   const playableTracks = tracks.filter((track) => track.preview_url);
