@@ -13,7 +13,7 @@ interface SocketConnection {
 const connect = (function () {
   return new Promise<SocketConnection>((resolve) => {
     const socket = new ReconnectingWebSocket(
-      `wss://${env.VITE_SERVER_HOST}:${env.VITE_WS_SERVER_PORT}`
+      `wss://${env.VITE_SERVER_HOST}:${env.VITE_WS_SERVER_PORT}/ws`
     );
 
     // Event listener to be called when the WebSocket connection is opened
